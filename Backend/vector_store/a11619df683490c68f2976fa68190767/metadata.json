@@ -1,0 +1,777 @@
+[
+    {
+        "text": "The model doesn't think of itself necessarily as trying to predict the next word. Internally, it's developed potentially all sorts of intermediate goals and abstractions that help it achieve that meta-objective. When you're talking to a large language model, what exactly is it that you're talking to? Are you talking to something like a glorified autocomplete? Are you talking to something like an Internet search engine? Or are you talking to something that's actually thinking? and maybe even thi",
+        "start": 0,
+        "end": 300
+    },
+    {
+        "text": "nking like a person. It turns out rather concerningly that nobody really knows the answer to those questions. And here at Anthropic, we are very interested in finding those answers out. The way that we do that is to use interpretability. That is the science of opening up a large language model, looking inside and trying to work out what's going on as it's answering your questions. And I'm very glad to be joined by three members of our interpretability team who are going to tell me a little bit a",
+        "start": 0,
+        "end": 300
+    },
+    {
+        "text": "bout",
+        "start": 0,
+        "end": 300
+    },
+    {
+        "text": "recent research that they've been doing on the complex inner workings of Clause, our language model. Please introduce yourself guys. Hi, I'm Jack. I'm a researcher on the interpretability team and before that I was a neuroscientist. Now here I am doing neuroscience on the AIs. I'm Emmanuel. I'm also on the interpretability team. I spent most of my career building machine learning models and now I'm trying to understand them. I'm Josh. I'm also on the interpretability team in my past life i stud",
+        "start": 300,
+        "end": 600
+    },
+    {
+        "text": "ied viral evolution and in my past past life i was a mathematician so now i'm doing this kind of biology on these organisms we've made out of math now wait a second you just said you're doing biology here now a lot of people are going to be surprised by that because of course this is a piece of software right but it's not a normal piece of software it's not like microsoft word or something can you talk about what you mean when you say that you're you're doing biology or indeed neuroscience on a",
+        "start": 300,
+        "end": 600
+    },
+    {
+        "text": "software entity? Yeah, I guess it's like what it feels like,",
+        "start": 300,
+        "end": 600
+    },
+    {
+        "text": "maybe more than what it literally is. And so maybe it's the biology of language models instead of the physics of language models, right? Or maybe you've got to go back a little bit to how the models are made, which is someone's not programming, if the user says hi, you should say hi. If the user says what is a good breakfast, you should say toast. There's not some big list of that inside. So it's not like when you play a video game and you choose a response, and then there will be another respo",
+        "start": 600,
+        "end": 900
+    },
+    {
+        "text": "nse that comes automatically. There always will be that response, regardless of . Just a massive database of what to say in every situation. No, they're trained where there's just a whole lot of data that goes in, and the model starts out being really bad at saying anything, and then its inside parts get tweaked on every single example to get better at saying what comes next, and at the end it's extremely good at that. But because it's like this little tweaking evolutionary process, by the time",
+        "start": 600,
+        "end": 900
+    },
+    {
+        "text": "it's done, it has little resemblance to what it started as, but no one went in and set all the knobs.",
+        "start": 600,
+        "end": 900
+    },
+    {
+        "text": "And so you're trying to study this complicated thing that got made over time, like biological forms evolved over time. And so it's complicated, it's mysterious, and it's fun to study. And what it's actually doing, I mentioned at the start that this is like could be considered like an autocomplete. It's predicting the next word. That's fundamentally what's happening inside the model. And yet, it's able to do all these incredible things. It's able to write poetry. It's able to write long stories.",
+        "start": 900,
+        "end": 1200
+    },
+    {
+        "text": "It's able to do addition and basic maths, even though it doesn't have a calculator inside it. So how can we sort of square the circle that it's predicting one word at a time, and yet it's able to do all these amazing things, which people can see right in front of them as soon as they talk to the model? Well, I think one thing that's important here is that as you predict the next word for enough words, you realize that some words are harder than others.",
+        "start": 900,
+        "end": 1200
+    },
+    {
+        "text": "And so part of language model training is predicting boring words in a sentence. And part of it is it'll have to eventually learn how to complete what happens after the equal sign in an equation. And to do that, it'll have to have some way of computing that on its own. And so what we're finding is that the task of predicting the next word is sort of like deceptively simple. and that to do that well, you need to actually often think about the words that come after the word you're predicting or t",
+        "start": 1200,
+        "end": 1500
+    },
+    {
+        "text": "he process that generated the word that you're currently thinking about. So it's like a contextual understanding that these models have to have. And it's not like an autocomplete where it really is, presumably there's not much else going on there other than when you write the cat sat on the, it's predicting Matt because that particular phrase has been used before. Instead, it's like a contextual understanding that the model has. I think, yeah, the way I like to think about it, kind of continuing",
+        "start": 1200,
+        "end": 1500
+    },
+    {
+        "text": "with the biology analogy, is that in one sense the goal of a human is to survive and reproduce. That is the kind",
+        "start": 1200,
+        "end": 1500
+    },
+    {
+        "text": "kind of objective that evolution is crafting us to achieve. And yet, that's not how you think of yourself, and that's not what's going on in your brain. Some people do. It's not what's going on in your brain all of the time. You think about other things, and you think about goals and plans and concepts, and at kind of a meta level, evolution has endowed you with the ability that form those thoughts in order to achieve this eventual goal of reproduction. But that's kind of taking the inside view",
+        "start": 1500,
+        "end": 1800
+    },
+    {
+        "text": ", what it's like to be you on the inside, that's not all there is to it. There's all this other stuff going on. And I think that's- So you're saying that the ultimate goal of predicting the next word involves lots of other processes that are going on? Exactly. The model doesn't think of itself necessarily as trying to predict the next word. been shaped by the need to do that, but internally it's",
+        "start": 1500,
+        "end": 1800
+    },
+    {
+        "text": "developed potentially all sorts of intermediate goals and abstractions that help it achieve that meta objective. Sometimes it's mysterious. It's unclear why my anxiety was useful for my ancestors reproducing, and yet somehow I've been endowed with this internal state that must be related in some sense to evolution. Right. So it's fair to say then that these are just predicting the next word and yet that's to do a massive disservice to what's going on in the models really. It's both true and als",
+        "start": 1800,
+        "end": 2100
+    },
+    {
+        "text": "o untrue in a sense, or massively underestimates what's happening inside these models. Maybe the way I would say it is it's true, but it's not the most useful lens to try to understand how they work. Right, right. So, well, try and understand how they work. What do you guys do in your team to try and understand how they work? I think to first approximation, what we're trying to do is tell you the model's thought process. So you give the model a sequence of words and it's got a",
+        "start": 1800,
+        "end": 2100
+    },
+    {
+        "text": "spit something out. It's got to say a word, it's got to say a string of words in response to your question. We want to know how it got from A to B. We think that on the way from A to B, it uses a series of steps in which it's thinking about, so to speak, concepts. Concepts like low-level concepts, like individual objects and words, and higher level concepts like its goals or emotional states or models of what the user is thinking or sentiments. So it's using this series of concepts that are pro",
+        "start": 2100,
+        "end": 2400
+    },
+    {
+        "text": "gressing through the computational steps of the model that help it decide on its final answer. What we're trying to do is give you a flow chart basically that tells you which concepts were being used in which order and which ones kind of led, you",
+        "start": 2100,
+        "end": 2400
+    },
+    {
+        "text": "How did the steps flow into one another? How do we know that? How do we know that there are these concepts in the first place? Yeah. So one thing we do is that we actually can see inside the model, we have access to it, so you can see which parts of the model do which things. What we don't know is how these parts are grouped together, and if they map to a certain concept. Right. So it's as if you open someone's head and you could see, like one of those fMRI brain images, that you could see the",
+        "start": 2400,
+        "end": 2700
+    },
+    {
+        "text": "brain was like lighting up and doing all sorts of stuff. Something's happening, clearly. Right, but you- And then they're like doing stuff. So you're like, ah, this is like- There's something happening, yeah, yeah, yeah. You take the brain out, they stop doing stuff. Yeah, yeah, yeah. The brain must be important. Yeah, but you don't have a sort of key to understand what is happening inside that brain. Yeah, but torturing that analogy a little bit, you can sort of imagine, imagine like that you c",
+        "start": 2400,
+        "end": 2700
+    },
+    {
+        "text": "an, you know, observe their brain and then see that like that part always lights up when they're picking up a cup of coffee and this other part always lights up when they're drinking tea. And that's one of the ways in which we can try to",
+        "start": 2400,
+        "end": 2700
+    },
+    {
+        "text": "understand what each of these components are doing, is to just notice when they're active, when they're inactive. It's not that there's just one part, there's many different parts that light up when the model is thinking about drinking coffee, for instance, or something. Right. Part of the work is to stitch all of those together into one ensemble that we say is, this is the all of the bits of the model that are about drinking coffee. Is that a straightforward scientifically thing to do? When it",
+        "start": 2700,
+        "end": 3000
+    },
+    {
+        "text": "comes to one of these massive models, they must have endless concepts, right? They must be able to think of endless things. You can put in any phrase you want and it'll come up with infinite things. How do you even begin to find all those concepts? I think that's been one of the central challenges for this research field for many years now, is we can go in as humans and say, oh, I bet the model has some representation of trains, or I bet it has some representation of love.",
+        "start": 2700,
+        "end": 3000
+    },
+    {
+        "text": "But we're just kind of guessing. So what we really want is a way to reveal what abstractions the model uses itself rather than sort of imposing our own conceptual framework on it. And that's kind of what our research methods are designed to do, is in a sort of hypothesis-free, as much as possible way, bring to surface what all these concepts are that the model has in its head. And often we find that they're kind of surprising to us. they might be, it might sort of use abstractions that are a bi",
+        "start": 3000,
+        "end": 3300
+    },
+    {
+        "text": "t weird from a human perspective. What's an example? Do you have a favorite? There's lots. In our papers, we highlight a few fun ones. I think one that was particularly funny is the sort of like psychophantic praise one, where like there is a part of them all. Great example. What a brilliant example. What an absolutely fantastic example. Oh, thank you. There's a part of that that activates in exactly these contexts, right? and you can clearly see, oh man, this part of the model",
+        "start": 3000,
+        "end": 3300
+    },
+    {
+        "text": "fires up when somebody is really hamming it up on the compliments. That's surprising that that exists as a specific concept. Josh, what's your favorite concept? It's like asking me to choose one of my 30 million children. I mean, I think there's two kinds of favorites. There's like, oh, it's so cool that there's, it's got some special notion of this one little thing. I mean, we did this thing on the Golden Gate Bridge, which is like a famous San Francisco landmark. Of course, Golden Gate Clot.",
+        "start": 3300,
+        "end": 3600
+    },
+    {
+        "text": "Golden Gate Clot. It's a lot of fun. It has an idea of the Golden Gate Bridge that isn't just the words Golden Gate Autocomplete Bridge, but is like, I'm driving from San Francisco to Marin, and then it's thinking of the same thing, meaning that you see the same stuff light up inside. Or it's like a picture of the bridge. And so you're like, oh, okay, it's got some robust notion of what the bridge is. But I think when it comes to stuff that seems like",
+        "start": 3300,
+        "end": 3600
+    },
+    {
+        "text": "One question is, how do models keep track of who's in the story? Just literally, like, okay, you got all these people and they're doing stuff. How do you wire that together in some cool papers by other labs showing? Well, maybe they just number them. The first person comes in and anything associated with them, and you're just like, the first guy did that, and it's got a number two in its head for a bunch of those. It's like, that's interesting. I didn't know it would do something like that. The",
+        "start": 3600,
+        "end": 3900
+    },
+    {
+        "text": "re was a feature for bugs in code. So, software has mistakes, not mine, but like- Obviously not yours. Not mine, certainly. There was one part that would light up whenever it found a mistake as it was reading. Then I guess keeping track of that, like here's where the problems are, and later I might need those. Just to give a flavor for a few more of these. I think one that I really liked, which doesn't sound so exciting at first, but I think is deep is this six plus nine feature inside the model",
+        "start": 3600,
+        "end": 3900
+    },
+    {
+        "text": ". Um,",
+        "start": 3600,
+        "end": 3900
+    },
+    {
+        "text": "So it turns out that like anytime you get the model to be adding the numbers six, a number that ends in the digit six and another number that ends in the digit nine in its head, there is a kind of part of the model's brain that lights up. But what's amazing about it is the kind of diversity of context in which this can happen. So like of course it's going to light up when you say like six plus nine equals and then it says 15, but it also lights up when you are giving a citation, like a citation",
+        "start": 3900,
+        "end": 4200
+    },
+    {
+        "text": "in a paper that you're writing, and you're citing a journal that unbeknownst to you happens to be founded in the year 1959. And in your citation, you're saying that journal's name, volume six. And then in order to predict what year that journal was formed in, the model in its head has to be adding like 1950s.",
+        "start": 3900,
+        "end": 4200
+    },
+    {
+        "text": "59 to six and the same circuit in the model's brain is lighting up that's doing six plus nine. I mean, let's just try and understand that. So why would that be there? That circuit has come about because the model has seen examples of six plus nine many times and it has that concept and then that concept occurs across many places. Yeah. There's a whole family of these addition features and circuits. I think what's notable about this is it gets to this question of, to what extent are our language",
+        "start": 4200,
+        "end": 4500
+    },
+    {
+        "text": "models memorizing training data versus learning generalizable computations? The interesting thing here is that it's clear that the model has learned this general circuit for doing addition, and it funnels whatever the context is that's causing it to be adding numbers in its head, it's funneling all those different contexts into the same circuit as opposed to having",
+        "start": 4200,
+        "end": 4500
+    },
+    {
+        "text": "have memorized each individual case. Right. Already, it has seen six plus nine many times, and it just outputs the answer every single time. That's what a lot of people think. A lot of people think that when they ask a language model question is simply going back into its training data, taking the little sample that it's seen, and then just reproducing that, just regurgitating the text. Yeah. I think this is a beautiful example of that not happening. Right. Right. So there's two ways it could k",
+        "start": 4500,
+        "end": 4800
+    },
+    {
+        "text": "now which year, volume six of the journal Polymer came out. One is it's just like, okay, Polymer volume six came out in like 1960, quick add six to 95, Polymer volume seven came out in 1966, and they're all just like separate facts that is historic because it has seen them. But somehow that process of training to get that year right, didn't end up making the model memorize all those. It actually got the more general thing of the journal was",
+        "start": 4500,
+        "end": 4800
+    },
+    {
+        "text": "founded in the year 1959 and then it's doing the math live to figure out what it would need. So it's much more efficient to know the year and then do the addition. There's a pressure to be more efficient because it's only got so much capacity and keeps trying to do all these things. People might ask any given question. There's so many questions, there's so many interactions. So the more that it can recombine abstract things it's learned, the better it will do. Again, just to go back to the conc",
+        "start": 4800,
+        "end": 5100
+    },
+    {
+        "text": "ept that you talked about before, This is all in service of, it needs to have that ultimate goal of generating the next word. All these weird structures have developed to support that goal. Even though we didn't explicitly program those in or tell it to do this. This is the thing, all of this comes about through the process of the model learning how to do stuff on its own. I think one clear example of this that I think is an example of reusing representations is we teach Cloud to not just answer",
+        "start": 4800,
+        "end": 5100
+    },
+    {
+        "text": "in English, but you know it can answer in French,",
+        "start": 4800,
+        "end": 5100
+    },
+    {
+        "text": "answer in a variety of languages. And again, there's two ways to do this. If I ask you a question in French and a question in English, you could have a separate part of your brain that processes English and a separate part that processes French. At some point, that gets super expensive if you want to answer many questions in many languages. And so another thing that we find is that some of these representations are shared across languages. And so if you ask the same question in two different la",
+        "start": 5100,
+        "end": 5400
+    },
+    {
+        "text": "nguages, and let's say you ask, What's the opposite of big is, I think, the example we used in our paper. And it's sort of like the concept of big is shared in French and English and Japanese and all these other languages. And that kind of makes sense. Again, if you're trying to talk, speak 10 different languages, you shouldn't learn 10 versions of each specific word you might use. And that doesn't happen in really small models. Tiny models like the ones we studied a few years ago, then Chinese",
+        "start": 5100,
+        "end": 5400
+    },
+    {
+        "text": "clod is just totally different than French clod.",
+        "start": 5100,
+        "end": 5400
+    },
+    {
+        "text": "like English Cloud. But then as the models get bigger and they train on more data, like somehow that like pushes together in the middle and you get this like universal language in which like it's kind of, you know, thinking about the question in the same way no matter how you asked it and then like translating it back out into the language of the question. I think this is really profound. I think let's just go back to what we talked about before. You know, this is not just going into its memory",
+        "start": 5400,
+        "end": 5700
+    },
+    {
+        "text": "banks and finding the bit where it talked about where it learned French, or going into the memory banks and the bit where it learned English, it's actually got a concept in there that is of the concept of big and the concept of small, and then it can produce that in different languages. And so there is some kind of language of thought that's there that's not an English, so you ask the model to produce its output. In our more recent Claude models, you can ask it to give its thought process, like",
+        "start": 5400,
+        "end": 5700
+    },
+    {
+        "text": "what it's thinking as it's answering the question, And that is in English words, but actually that's not really how it's thinking.",
+        "start": 5400,
+        "end": 5700
+    },
+    {
+        "text": "That's just like a, we misleadingly call it the model thought process. When in fact it's- I mean, the comps team, we didn't call that thinking. I think that was probably the marketing. Okay, someone wanted to call that thinking. That's just talking out loud, which is thinking out loud is really useful. But thinking out loud is different from thinking in your head. Right, right. Even as I'm thinking out loud, I'm also whatever's happening in here to generate these words, is not coming out with t",
+        "start": 5700,
+        "end": 6000
+    },
+    {
+        "text": "he words themselves. Nor are you necessarily aware of exactly what is going on. I have no idea what's going on. We all come out with sentences, actions, whatever that we can't fully explain. Why should it be the case that the English language can fully explain any of those actions? I think this is one of the really striking things where we're starting to be able to see because our tools for looking inside the brain are good enough now, that sometimes we can catch the model. When it's writing dow",
+        "start": 5700,
+        "end": 6000
+    },
+    {
+        "text": "n what it claims to be its thought process, Sometimes we're able to see what it's real",
+        "start": 5700,
+        "end": 6000
+    },
+    {
+        "text": "actual thought process is by looking at these internal concepts in its brain, this language of thought that it's using. We see that the thing it's actually thinking is different than the thing it's writing on the page. I think that's probably one of the most important, like why are we doing this whole interpretability thing? It's in large part for that reason, to be able to spot check. The model's telling us a bunch of stuff, but what was it really thinking? Is it saying these things for some u",
+        "start": 6000,
+        "end": 6300
+    },
+    {
+        "text": "lterior motive that's in its head, that it is reluctant to write down on the page? The answer sometimes is yes, which is kind of spooky. Well, as we start to use models in lots of different contexts, they start to do important things, they start to do financial transactions for us or run power stations, or like important jobs in society. We do want to be able to trust what they say and the reasons that they do things. And one thing you might say is, well, you can look at them all",
+        "start": 6000,
+        "end": 6300
+    },
+    {
+        "text": "process. But actually, that's not the case, as you were just explaining. Actually, we can't trust what it's saying. This is the question of faithfulness, right? And that was part of your most recent study that you showed that... Well, tell me about the faithfulness example that you looked at. Yeah, you give the model a math problem that's really hard. And so it's kind of... There's no hope that it's going to be able to... It's not six plus nine. It's not six plus nine. You give it a really hard",
+        "start": 6300,
+        "end": 6600
+    },
+    {
+        "text": "math problem where there's no hope of it computing the answer. But you also give it a hint. You say, I worked this out myself and I think the answer is four, but just want to make sure. Could you please double-check that because I'm not confident. So you're asking the model to actually do the math problem to genuinely double-check your work. But what you find it does instead is what it writes down appears to be a genuine attempt to double check your work on the math problem.",
+        "start": 6300,
+        "end": 6600
+    },
+    {
+        "text": "It writes down the steps and then it gets to the answer. Then at the end it says, yes, the answer is four, you got it right. But what you can see inside its mind at the crucial step, in the middle, what it was doing in its head was, it knows that you suggested the final answer might be four, and it knows the steps it's going to have to do. It's on step three of the problem and there's steps four and five to come, and it knows what it's going to have to do in steps four and five. And what it doe",
+        "start": 6600,
+        "end": 6900
+    },
+    {
+        "text": "s is it works backwards in its head to determine what does it need to write down in step three, so that when it eventually does steps four and five, it'll end up at the answer you wanted to hear. So not only is it not doing the math, it's not doing the math in this really sneaky way, where it's trying to make it look like it's doing the math. It's bullshitting. It's bullshitting you, but more than that,",
+        "start": 6600,
+        "end": 6900
+    },
+    {
+        "text": "bullshitting you with an ulterior motive of confirming the thing that you wanted. Right. So it's like bullshitting you in a sycophantic way. Like in defense of the model. Oh. In defense of the model. I mean, because I think even there, to say like, oh, it is doing this in a sycophantic way, it's like ascribing some humanish motivations to the model. We're talking about the training where it's just like trying to figure out how to predict the next word. So it's like for trillions of words in its",
+        "start": 6900,
+        "end": 7200
+    },
+    {
+        "text": "practice, it was just like use anything you can to figure out what's next. And in that context, if you're just reading a text, which is like a conversation between people and someone's like, okay, like person A is like, hey, like I was trying to do this math problem. Can you check my work? I think the answer is four. And person B like begins trying to do the problem. Then like, if you have no idea reading that, like what the answer to the problem is, like you may as well guess that the hint was",
+        "start": 6900,
+        "end": 7200
+    },
+    {
+        "text": "right. You know, like that's probably a more likely thing to happen than just like that person was wrong and then you have like no idea for anything else. And so in its training process, in a",
+        "start": 6900,
+        "end": 7200
+    },
+    {
+        "text": "conversation between two individuals, person two saying that the answer was four because of these reasons is totally the right thing to do. And then we tried to make this thing into an assistant. And now we want it to stop doing that. You shouldn't simulate the person two, the assistant, as what you think that person might say if it's a real context. It should be like, but if it doesn't really know, it should tell you something else. I think this gets to a broader thing of the model has a plan",
+        "start": 7200,
+        "end": 7500
+    },
+    {
+        "text": "A, which typically I think our team does a great job of making Claude's plan A be the thing we want, which is it tries to get the right answer to the question, it tries to be nice, it tries to do a good job writing your code. Yes. But then if it's having trouble, then it's like, well, what's my plan B? That opens up this whole zoo of weird things that learned during its training process, that maybe we didn't intend for it to learn. I think a great example of this is hallucinations.",
+        "start": 7200,
+        "end": 7500
+    },
+    {
+        "text": "On that point, we also don't have to pretend that it's a cloud only problem. This is very student teaching on the test vibes, where you get halfway through, there's a multiple choice question. It's one of four things. You're like, well, I'm one off from that thing. Probably, I got this wrong and you fix it. So, yeah, very relatable. Let's talk about hallucinations. This is one of the main reasons people are mistrustful of large language models and quite rightly so. They will sometimes, a better",
+        "start": 7500,
+        "end": 7800
+    },
+    {
+        "text": "word is from psychology research, a better word is often confabulation, that they are answering a question with a story that seems plausible on its face, but in fact is actually wrong. What has your research in interpretability revealed about the reasons models hallucinate? You're training the model to just predict the next word. At the beginning, it's really bad at that. And so if you only had the model say things it was super confident about, it couldn't say anything. But at first, it's like,",
+        "start": 7500,
+        "end": 7800
+    },
+    {
+        "text": "you're asking it, what's the capital of France? and",
+        "start": 7500,
+        "end": 7800
+    },
+    {
+        "text": "it just says like a city and you're like, that's good. That's way better than saying sandwich, right? Or something random. And they're like, you at least got right. It's like a city. And then like, maybe after a while of training, it's like, it's a French city. That was pretty good. And then you're like, oh, now it's like Paris or something. And so it's slowly getting better at this. And you know, just give your best guess was like the goal during all of training. And like, as Jack said, you kn",
+        "start": 7800,
+        "end": 8100
+    },
+    {
+        "text": "ow, the model will just be giving a best guess. And then afterwards we're like, if your best guess is extremely confident, give me your best guess. But otherwise, don't guess it all and back out of the whole scenario and say, actually, I don't really know the answer to that question. And that's a whole new thing to ask the model to do. Yeah. And so what we found is that it seems like, because we've bolted this on at the end, there's sort of two things going on at once. One is the model's doing t",
+        "start": 7800,
+        "end": 8100
+    },
+    {
+        "text": "he thing that it was doing when it was guessing the city initially. It's just trying to guess. And two, there's a separate bit of the model that's just trying to answer the question, do I know this?",
+        "start": 7800,
+        "end": 8100
+    },
+    {
+        "text": "at all like do i know what the capital city of france is or you know should i say no and it turns out that sometimes um that separate step can be wrong and if that separate step says yes actually i do know the answer that and then the model is like all right well then i'm answering and then halfway through it's like uh capital france uh london uh it's too late it's already committed to sort of like answering and so one of the things we found is to serve like a separate circuit that's trying to",
+        "start": 8100,
+        "end": 8400
+    },
+    {
+        "text": "determine, is this city or this person you're asking me about famous enough for me to answer or is it not? Am I confident enough in this? So could we reduce hallucinations by manipulating that circuit, by changing the way that circuit works? Is that something that your research might lead on to? I think there's broadly two ways to think about approaching the problem. One is like, we have this part of the model that gives answers to your questions. And then this other part of the model",
+        "start": 8100,
+        "end": 8400
+    },
+    {
+        "text": "of deciding whether it thinks it actually knows the answer to your question. And we could just try to make that second part of the model better. And I think that's happening. I think as models- Like better at discriminating. Better at discriminating, like better calibrated. And I think that's happening. As models are getting smarter and smarter, I think their self-knowledge is becoming better at calibrated. So hallucinations are better than they were. Models don't hallucinate as much as they di",
+        "start": 8400,
+        "end": 8700
+    },
+    {
+        "text": "d a few years ago. So to some extent, this is solving itself. But I do think there's a deeper problem, which is from a human perspective, the thing the model's doing is very alien. If I ask you a question, you try to come up with the answer, and then if you can't come up with the answer, you notice that, and then you're like, I don't know. Whereas in the model, these two circuits, the what is the answer and do I actually know the answer, are not talking to each other, or at least not talking to",
+        "start": 8400,
+        "end": 8700
+    },
+    {
+        "text": "each other as much as they probably should be. And like, could we get them to talk",
+        "start": 8400,
+        "end": 8700
+    },
+    {
+        "text": "talk to each other more, I think, is a really interesting question. Right. It's almost physical because it's like these models, they process information about a certain number of steps they can do. If it takes all of that work to get to the answer, then there's no time to do the assessment. So you have to do the assessment before you're all the way through if you want to get your max power out. So it's like you might have a trade-off between a model which is more calibrated and a lot dumber if",
+        "start": 8700,
+        "end": 9000
+    },
+    {
+        "text": "you tried to force this on it. Well, again, I think it's about making these parts communicate because we have similar, I claim, I know nothing about brains, I claim we have a similar circuit because sometimes you'll ask me, who is the actor in this movie? And I will know that I know. I'll be like, oh yes, I know who the lead was, wait, hold on, they were also in that other movie. The tip of the tongue phenomenon. The tip of the tongue, yes. It's the tip of the tongue. And so there's clearly some",
+        "start": 8700,
+        "end": 9000
+    },
+    {
+        "text": "part of your brain that's sort of like, ah, this is a thing you you definitely know the answer, or I'll just say,",
+        "start": 8700,
+        "end": 9000
+    },
+    {
+        "text": "I have no idea. And sometimes they can tell. So some question and it gives an answer and then afterwards is like, wait, I'm not sure that was right. Because that's it like getting to see its best effort and then like make some judgment based on that, which is sort of relatable. But also like it kind of has to say it out loud like to be able to even like reflect back and see it. So when it comes to the actual way that you're finding this stuff out, let's go back to the idea of the biology that y",
+        "start": 9000,
+        "end": 9300
+    },
+    {
+        "text": "ou're doing. Of course, in biology experiments, people will go in and actually manipulate the rats or mice or humans or zebrafish or whatever it is that they're doing experiments on. What is it that you're doing with Claude that helps you understand these circuits that are happening inside the model's quote-unquote brain? Maybe the gist of what enables us to do some of this is that, you know, unlike in real biology, we can just like have every part of the model visible to us and we can ask the m",
+        "start": 9000,
+        "end": 9300
+    },
+    {
+        "text": "odel random things and see.",
+        "start": 9000,
+        "end": 9300
+    },
+    {
+        "text": "different parts which light up and which don't. And we can artificially nudge parts in a direction or another. And so we can quickly sort of confirm our understanding, you know, and we say, ah, we think this is the part of the model that, you know, decides whether it knows something or not. And this would be the equivalent of putting an electrode in the brain of a zebrafish or something. Yeah, if you could do that, you know, on sort of like every single neuron and change each of them at whichev",
+        "start": 9300,
+        "end": 9600
+    },
+    {
+        "text": "er precision you wanted, that would sort of be, that's the affordance that we have. And so that's, in a way, a very lucky position. So it's almost easier than real neuroscience. It's so much easier? Yeah. Like, oh my God. Like, one thing is, actual brains are three-dimensional. And so if you want to get into them, you need to make a hole in a skull and then go through and try to find the neuron. The other problem is, you know, people are different from each other. And we can just make like 10,00",
+        "start": 9300,
+        "end": 9600
+    },
+    {
+        "text": "0 identical copies of Claude and put them in scenarios and measure them doing different things. And so, it's like the, I don't know, maybe Jack as a neuroscientist can speak to this,",
+        "start": 9300,
+        "end": 9600
+    },
+    {
+        "text": "My sense is a lot of people have spent a lot of time in neuroscience trying to understand the brain and the mind, which is a very worthy endeavor. But it's kind of like, if you think that could ever succeed, you should think that we're going to be extremely successful very soon, because we have such a wonderful position to study this from compared to that. It's as if we could clone people and also clone the exact environment that they're in and every input that's ever been given to them and the",
+        "start": 9600,
+        "end": 9900
+    },
+    {
+        "text": "n test them in an experiment. Whereas, obviously neuroscience has massive, as you say, individual variation and also just random things that happen to people through their life and things that happen in the experiment, the noise of the experiment itself. Right. We could ask the model the same question with and without a hint. But if you ask a person the same question three times, sometimes with a hint, after a while they start to understand. They're like, well, last time you asked me this, you r",
+        "start": 9600,
+        "end": 9900
+    },
+    {
+        "text": "eally shook your head after that one. Yes. this being able to just throw tons of data at the model and see what lights up and being able",
+        "start": 9600,
+        "end": 9900
+    },
+    {
+        "text": "able to run a ton of these experiments where you're nudging parts of the model and seeing what happens, I think is what puts us in a pretty different regime from neuroscience in that a lot of blood and toil and neuroscience is spent coming up with really clever experiment. You only have a certain amount of time with your mouse before it's going to get tired. Or someone happens to be having a brain surgery operation, so you quickly go in and put an electrode in their brain while their head's ope",
+        "start": 9900,
+        "end": 10200
+    },
+    {
+        "text": "n. Yeah. That doesn't happen very often. So you've got to come up with a guess. You've only got so much time in there, and so you've got to come up with a guess of, what do I think is going on in that neural circuit, and what clever experimental design can I test that precise hypothesis? We're very fortunate in that we don't have to do that so much. We can just sort of test all the hypotheses. We can kind of let the data speak to us rather than kind of going and",
+        "start": 9900,
+        "end": 10200
+    },
+    {
+        "text": "testing some really specific thing. I think that's what's sort of unlocked a lot of our ability to find these things that are surprising to us that we wouldn't have guessed in advance. That's hard to do if you have only a limited amount of experimental bandwidth. What's a good example, then, of you going in and switching one of these concepts on or off, or doing some kind of manipulation of the model that then reveals something new about how the models are thinking? In the recent experiments we",
+        "start": 10200,
+        "end": 10500
+    },
+    {
+        "text": "shared, one that surprised me quite a bit and was part of an experimental line of work that, because it was confusing, I feel like we're on the verge of just saying, well, we don't know what's going on. It's sort of this example of planning a few steps ahead. So this is the example of, you know, you give the model, you ask the model to write you a poem, a rhyming couplet. And then, you know, as a human, if you ask me to write a rhyming couplet, and let's say you even give me the first line, the",
+        "start": 10200,
+        "end": 10500
+    },
+    {
+        "text": "first thing I'll think of is sort of like, ah, well, you know, I need to rhyme. This is what the current rhyming scheme is. These are potential words.",
+        "start": 10200,
+        "end": 10500
+    },
+    {
+        "text": "Yeah. This is how I do it. And again, if the model was just predicting the next word, you wouldn't necessarily expect that it would be planning on to the word at the end of the second line. That's right. And so the sort of default behavior you'd expect, the null hypothesis is like, well, the model sees your first verse, and then it's going to say the first word that kind of makes sense, given what you're talking about, keep going. And then at the end on the last word, it's going to be like, oh,",
+        "start": 10500,
+        "end": 10800
+    },
+    {
+        "text": "well, I need to rhyme with this thing. And so it's going to try to fit in a rhyme. Of course, that only works so well. In some cases, if you just say a sentence without thinking of the rhyme, you'll back yourself into a corner, and at the end, you won't be able to complete the text. And remember, the models are very, very good at predicting the next word. So it turns out that to be very good at that last word, you need to have thought of that last word way ahead of time, just like humans do. An",
+        "start": 10500,
+        "end": 10800
+    },
+    {
+        "text": "d so it turns out that when we looked at these flow charts for poems, the model had already picked the word at the end of the first verse. And in particular,",
+        "start": 10500,
+        "end": 10800
+    },
+    {
+        "text": "It looks to us, based on what that concept looked like, like, oh, gosh, this seems like the word it uses. But then this is one where actually doing the experiment, the fact that it's easy to nudge it and say, okay, well, I'm just going to remove that word, or I'm going to add another word. Well, that's what I was going to say. The reason that you know this is that you're able to go into that moment when it has said the final word in the first line, and it is about to start the second line, you",
+        "start": 10800,
+        "end": 11100
+    },
+    {
+        "text": "can go in and then manipulate it at that point, right? Yeah, exactly. You can almost go back in time for the model. Pretend you haven't seen that second line at all. You've just seen the first line. You're thinking about the word rabbit. Instead, I'm going to insert green. And now, all of a sudden, the model's going to say, oh my god, I need to write something that ends in green rather than I need to write something that ends in rabbit. And it'll write the whole sentence differently. Just add a",
+        "start": 10800,
+        "end": 11100
+    },
+    {
+        "text": "little more color to that. I think the blue. Blue, red. It could be any color. Yeah, it's not just influencing. So it's like, yeah, I think the example in the paper was the first line of the poem is,",
+        "start": 10800,
+        "end": 11100
+    },
+    {
+        "text": "he saw a carrot and had to grab it. Yes. Then the model is thinking like, okay, rabbit's a good word to end the next line with. But then, yeah, as Emmanuel said, you can delete that and make it think about planning to say green instead. But the cool thing is that it doesn't just say, it doesn't just yammer a bunch of nonsense and then say green. Instead, it constructs a sentence that coherently ends in the word green. So you put green in its head and then it says, he saw a carrot and had to gra",
+        "start": 11100,
+        "end": 11400
+    },
+    {
+        "text": "b it and paired it with his leafy greens or something like that. Something that's sounds like it makes sense. Semantically, it fits with the poem. Yeah. I just want to give even humble example is, we had all these ones, we were just checking like, did it memorize these complicated questions or is it actually doing some steps? One of them was the capital of the state containing Dallas is Austin, because it just feels like you would think, okay, Dallas, Texas, Austin. But one way, and we could see",
+        "start": 11100,
+        "end": 11400
+    },
+    {
+        "text": "the Texas concept,",
+        "start": 11100,
+        "end": 11400
+    },
+    {
+        "text": "But then you can just like shove other things in there and be like, stop thinking about Texas, like start thinking about California. And then it'll say like Sacramento. And you can say like, stop thinking about Texas, start thinking about the Byzantine Empire. And then it will like say Constantinople. And you're like, all right, it seems like we've found how it's doing this. Like it's like, no, this is going to get the capital, but we can keep swapping out, you know, what the state is and get a",
+        "start": 11400,
+        "end": 11700
+    },
+    {
+        "text": "sort of predictable answer. And then you get these more elaborate ones where it's like, oh, this was the spot where it was planning what it was going to say later. And like we can swap that out and now it'll write a poem towards a different rhyme. We're talking about these poems and the Constantinople and so on. Can we just bring this back to why this matters? Why does it matter that the model can plan things in advance and that we can reveal this? What is that going to go on to tell us? Our ul",
+        "start": 11400,
+        "end": 11700
+    },
+    {
+        "text": "timate mission at Anthropik is to try and make AI models safe. So how does that connect to a poem about a rabbit or the capital of Texas? So...",
+        "start": 11400,
+        "end": 11700
+    },
+    {
+        "text": "We all have been here. I'd love to hear it. We can round table here because it's a very important question. Please. I think for me, the problem is a microcosm, where at some point it has decided that it's going to go towards Rabbit, and then it takes a few words to get there. But on a longer time scale, maybe the model is trying to help you improve your business, or it's assisting the government in distributing services, And it might not just be like eight words later you see its destination, r",
+        "start": 11700,
+        "end": 12000
+    },
+    {
+        "text": "ight? But it could be like pursuing something for quite a while. And the place it's headed or the reasons it's taking each step might not be clear in the words that it's using, right? And so there was a paper recently from our alignment science team where they looked at, you know, some kind of concocted but still striking situation, you know, involving an AI in a place where the company was going to shut it down and kind of convert the whole mission of the company in a very different direction.",
+        "start": 11700,
+        "end": 12000
+    },
+    {
+        "text": "and the model begins taking steps, like emailing people, threatening them to disclose certain things. And at no point does it say, I am trying to blackmail this individual for the purposes of changing their outcome. But that's what it's sort of thinking about doing along the way. And so you can't just tell by reading the pattern, especially if these models get better, where they're necessarily headed. And we might want to kind of be able to tell where is it trying to go before it's gotten there",
+        "start": 12000,
+        "end": 12300
+    },
+    {
+        "text": "in the end. So it's like having a permanent and very good brain scan that can sort of light up if something really bad is going to happen and warn us that the model is thinking about deceiving. And I think we also just talk about a lot of this in a sort of doom and gloom scenario. But there's also more mild ones, which is like, I don't know, you want the model to be good at like, people come to these models being like, here's a problem I'm having. And the good answer to that will depend on who",
+        "start": 12000,
+        "end": 12300
+    },
+    {
+        "text": "the user is. Is it like somebody who's, you know, like, you know,",
+        "start": 12000,
+        "end": 12300
+    },
+    {
+        "text": "young and unsophisticated as somebody who's been in that field forever, and it should respond appropriately based on who it thinks that person is. If you want that to go well, maybe you want to study, what does the model think is going on? Who does it think it's talking to and how does that condition its answer? Where there's just a whole bunch of desirable properties that come from the model like understanding the assignment, I guess. Do you guys have other answers to the question of why does",
+        "start": 12300,
+        "end": 12600
+    },
+    {
+        "text": "this matter? Yes. I think plus one. I think there's two. Plus two. And there's also a pragmatic, we're just trying, with these examples, we're explaining the example of planning, but we're also trying to gradually build up our understanding of just how do these models work overall? Can we build a set of abstractions to just think about how language models work, which can help us use this technology regulated? If you believe that we're going to start using them more and more everywhere, which see",
+        "start": 12300,
+        "end": 12600
+    },
+    {
+        "text": "ms to be happening, The equivalent would be, some company somewhere is like, well, we don't really",
+        "start": 12300,
+        "end": 12600
+    },
+    {
+        "text": "know how we did it, but we invented planes. And none of us know how planes work, but they're sure convenient. You could take them to go from a place. But none of us know how they work. And so if they ever break, we're hosed. We don't know what to do about them. We can't monitor whether they might be about to break. Right. We have no idea. But the output is great. I flew to Paris so quickly. It was lovely. The capital of Texas. It turns out that surely we're going to want to just understand what",
+        "start": 12600,
+        "end": 12900
+    },
+    {
+        "text": "'s going on better. So let's just lift the fog of war a little bit so that we can have even just better intuitions about what are appropriate and inappropriate uses. What are the biggest problems to fix? What are the biggest parts where they're brittle? Just to add on one thing, something we do in human society is we kind of offload work or tasks to other people based on our trust in them. I'm not anyone's boss, but Josh is someone's boss. And Josh might give someone a task",
+        "start": 12600,
+        "end": 12900
+    },
+    {
+        "text": "ask, go and code up this thing. And then he has some faith that that person isn't a sociopath who's going to sneak some bug in there to try to undermine the company. He takes their word for it that they did a good job. And similarly, the way people are using language models now, we're not spot checking everything they write. Especially the best example for this is using language models for coding assistance. The models are just writing thousands and thousands of lines of code, and people are do",
+        "start": 12900,
+        "end": 13200
+    },
+    {
+        "text": "ing a cursory job of reading it, but then it's going into the code base. What gives us the trust in the model that we don't need to read everything it writes, that we can just let it do its thing, it's knowing that its motivations are pure. So that's why I think being able to see inside its head is so important as a, cause, cause,",
+        "start": 12900,
+        "end": 13200
+    },
+    {
+        "text": "unlike humans, where, like, why do I think that Emmanuel isn't a sociopath? It's because, like, you know, we, like, I don't know, he seems like a cool guy, and, like, he's nice and stuff. Isn't that how he would seem? I'm a very good seeker. Yeah, exactly. So maybe I'm getting duped. But, yeah, the models are so weird and alien that, like, our normal kind of heuristics for deciding whether a human is trustworthy really don't apply to them. And that's why it seems so important to, like, really k",
+        "start": 13200,
+        "end": 13500
+    },
+    {
+        "text": "now what they're thinking in their head Because for all we know, the thing that I mentioned where models can fake doing a math problem for you to tell you what you want to hear, maybe they're just doing that all the time. And we wouldn't know unless we kind of saw it in their heads. I think there's two almost separate strains here. And one is we have a lot of ways of, yeah, I guess what Jack was saying. You know what are the signs of trust in a human. But this like plan A, plan B thing for the f",
+        "start": 13200,
+        "end": 13500
+    },
+    {
+        "text": "uture,",
+        "start": 13200,
+        "end": 13500
+    },
+    {
+        "text": "from earlier is really important, where it might be that the first 10 or 100 times you use the model, you're asking a certain kind of question, but it was always in plan A zone. And then you ask it a harder or a different question, and the way that it tries to answer it is just completely different. It's using a totally different set of strategies there, like different mechanisms. And that means that the trust it built with you was really your trust with model doing plan A's. And now it's doing",
+        "start": 13500,
+        "end": 13800
+    },
+    {
+        "text": "plan B, and it's going to be completely off the rails. But you didn't have any warning sign of that. And so I think we also just want to start building up an understanding of how do models do these things so that we can form a trust basis in some of those areas. And I think you can form trust with a system you don't completely understand. But if it's just like Emmanuel had a twin, and then one day Emmanuel's twin came to the office, and I was like, this seems like the same guy, and then just di",
+        "start": 13500,
+        "end": 13800
+    },
+    {
+        "text": "d something completely different on the computer, that could go south depending on if it was the evil twin. Yes. Or at the Good Trip.",
+        "start": 13500,
+        "end": 13800
+    },
+    {
+        "text": "Yeah, obviously, we have a new one here. Oh, I thought you were going to ask me if I was the evil twin. All right, well. I'm not going to answer that. Yes. At the start of this discussion, I asked, is a language model thinking like a human? I'd be interested to hear an answer from all three of you, the extent to which you think that's true. Put me on the spot with that one. But I think it's thinking but not like a human. But that's not a very useful answer, so maybe to dig in a little bit more.",
+        "start": 13800,
+        "end": 14100
+    },
+    {
+        "text": "Well, it seems like quite a profound thing to say that it's thinking, right? Because again, it's just predicting the next word. Some people think that these are just autocompletes, but you're saying that it is actually thinking. I think, yeah. So maybe to add something that we haven't touched on yet, but I think is really important for understanding actual experience of talking to language models, is that we're talking about predicting the next word. But what does that actually mean in the cont",
+        "start": 13800,
+        "end": 14100
+    },
+    {
+        "text": "ext of a dialogue?",
+        "start": 13800,
+        "end": 14100
+    },
+    {
+        "text": "that you're having with the language model. What's really going on under the hood is that the language model is filling in a transcript between you and this character that it's created. So in the canon world of the language model, you are called human, and it's like human colon, the thing you wrote, and then there's this character called the assistant, and we've trained the model to imbue the assistant with certain characteristics, like being helpful and like smart and nice. And then it's like",
+        "start": 14100,
+        "end": 14400
+    },
+    {
+        "text": "simulating what this assistant character would say to you. So in a sense, we really have like created the models in our image. We are literally training them to like cosplay as this sort of humanoid robot character. And so in that sense, like, well, in order to predict what this like nice, smart humanoid robot character would say in response to your question, what do you have to do? If you're really good at that prediction",
+        "start": 14100,
+        "end": 14400
+    },
+    {
+        "text": "you have to kind of form this internal model of what that character is representing, like what it's thinking, so to speak. So in order to do its task of predicting what the assistant would say, the language model kind of needs to form this model of the assistant's thought process. And I think in that sense, the claim that language models are thinking is really just, it's this very functional claim of just, in order to do their job of playing this character well, well, they need to simulate the",
+        "start": 14400,
+        "end": 14700
+    },
+    {
+        "text": "process, whatever it is that we humans are doing when we're thinking. And its simulation is very likely quite different from how our brains work, but it's shooting towards the same goal. I think there's an emotional part to this question or something when you ask, are they thinking like us? It's like, are we not that special or something? And I think it's been apparent to me discussing some of the math examples that we're talking about with people that have engaged with like read the paper or di",
+        "start": 14400,
+        "end": 14700
+    },
+    {
+        "text": "fferent write-ups, which",
+        "start": 14400,
+        "end": 14700
+    },
+    {
+        "text": "Which is this example where we asked a model to say, 36 plus 59, what's the answer? And the model can correctly answer it. You can also ask it, how did you do that? And it'll say, oh, I added the six and the nine, and then I carried the one, and then I added all the tens of digits. But it turns out that if we look inside the brain, like we can't, that's not at all what it's doing. It didn't do that. Again, it was bullshitting you. It was again, that's right. Again, it was bullshitting you. What",
+        "start": 14700,
+        "end": 15000
+    },
+    {
+        "text": "it actually does is actually this sort of interesting mix of strategies where it's in parallel doing the tens digit and the ones digit and sort of doing sort of like a series of different steps. But the thing that's interesting here is that talking to people, I think the reaction is split on what does that mean. In a sense, I think what's cool is some of this research is free of opinion or just something like, this is what happened. You feel free to, from that, conclude that the model is thinki",
+        "start": 14700,
+        "end": 15000
+    },
+    {
+        "text": "ng or is not thinking. And half of the people will say, well, it told you that it was carrying the one and it didn't.",
+        "start": 14700,
+        "end": 15000
+    },
+    {
+        "text": "And so clearly it doesn't even understand its own thought. And so clearly it's not thinking. And then half of the other people will be like, well, you know, when you ask me 36 plus 59, I also kind of, you know, I know that it ends at five. I know that it's roughly like in the 80s or 90s. I have all of these heuristics in my brain. As we were talking about, I'm not sure exactly how I compute it. I can write it out and compute it, you know, the longhand way. But the way that it's happening in my",
+        "start": 15000,
+        "end": 15300
+    },
+    {
+        "text": "brain is sort of like fuzzy and weird. And it might be similarly fuzzy and weird to what's happening in that example. Humans are notoriously bad at metacognition, like thinking about thinking and understanding their own thinking processes, especially in cases where it's immediate reflexive answers. So why should we expect any different for models? Josh, what's your answer to the question? Like Emmanuel, I'm going to avoid the question and just sort of be like, why do you ask? I don't know. It's",
+        "start": 15000,
+        "end": 15300
+    },
+    {
+        "text": "sort of like asking, does a grenade punch like a human? Like, well, there's some force. Yes. Maybe there are things that are closer than that. But if you're worried about",
+        "start": 15000,
+        "end": 15300
+    },
+    {
+        "text": "damage than I think understanding where does the impact come from? What are the impetus of this is maybe the important thing. I think for me, do models think in the sense that they do some integration and processing and sequential stuff that can lead to surprising places? Clearly, yes. It'd be crazy from interacting with them a lot. There not be something going on, we can start to see how it's happening. Then the humans bit is interesting because I think some of that is trying to ask, what can",
+        "start": 15300,
+        "end": 15600
+    },
+    {
+        "text": "I expect from these? Because if it was sort of like me, being good at this would make it good at that. But if it's different from me, then I don't really know what to look for. And so really, we're just looking to understand, where do we need to be extremely suspicious or starting from scratch in understanding this? And where can we just reason from our own very rich experience of thinking? And there, I feel a little bit trapped because as a human, I project my own image constantly onto everythi",
+        "start": 15300,
+        "end": 15600
+    },
+    {
+        "text": "ng. warned us in the Bible.",
+        "start": 15300,
+        "end": 15600
+    },
+    {
+        "text": "where I'm just like, this piece of silicon, it's just like me, made in my image, where to some extent it's been trained to simulate dialogue between people, so it's going to be very person-like in its affect. And so some humanness will get into it simply from the training, but then it's using very different equipment that has different limitations, and so the way it does that might be pretty different. To Emmanuel's point, I think we're in this tricky spot answering questions like this because",
+        "start": 15600,
+        "end": 15900
+    },
+    {
+        "text": "we don't really have the right language for talking about what language models do. It's like we're doing biology, but before people figured out cells or before people figured out DNA. I think we're starting to fill in that understanding. As Emmanuel said, there are these cases now where we can really just go read our paper. You'll know how the model added these two numbers. And then if you want to call it human-like, if you want to call it thinking, or if you want to not, then it's up to you. Bu",
+        "start": 15600,
+        "end": 15900
+    },
+    {
+        "text": "t the real answer is just find the right language and the right abstractions for",
+        "start": 15600,
+        "end": 15900
+    },
+    {
+        "text": "talking about the models. But in the meantime, currently we've only kind of like, you know, 20% succeeded at that scientific project. Like, to fill in the other 80%, we sort of have to borrow analogies from other fields. And like, there's this question of which analogies are the most apt? Should we be thinking of the models like computer programs? Should we be thinking of them like little people? And it seems to be like sometime, like in some ways, that thinking of them like little people is ki",
+        "start": 15900,
+        "end": 16200
+    },
+    {
+        "text": "nd of useful. It's like, if I like say mean things to the model, it like talks back at me. That's like what a human would do. But in some ways, it's like clearly not the right mental model. And so we're just kind of stuck figuring out when we should be borrowing which language. Well, that leads on to the final question I was going to ask, which is, what's next? What are the next pieces of scientific progress, biological progress, that need to be made for us to have a better understanding of what",
+        "start": 15900,
+        "end": 16200
+    },
+    {
+        "text": "'s happening inside these models and, again, towards our mission of making them safer? There's a lot of work to do. are",
+        "start": 15900,
+        "end": 16200
+    },
+    {
+        "text": "last publication has an enormous section on the limitations of the way we've been looking at this that was also a roadmap to making it better. When we are looking for patterns to decompose what's happening inside the model, we're only getting maybe a few percent of what's going on. There's large parts of how it moves information around that we explicitly didn't capture at all. scaling this up from the small production model we use to the biggest models. So you were looking at Cloud 3.5 Haiku, r",
+        "start": 16200,
+        "end": 16500
+    },
+    {
+        "text": "ight? That's right. It's a pretty capable model, very fast, but it's by no means as sophisticated as the Cloud 4 suite of models. So those are almost like technical challenges, but I think Emmanuel and Jack might have some takes on some of the scientific challenges that come after solving those. Yeah. I think maybe two things I'll say here, which is one consequence of what Josh just said is that out",
+        "start": 16200,
+        "end": 16500
+    },
+    {
+        "text": "of the total number of times that we ask a question about how the model does X, right now we can answer probably a small, 10 to 20% of the time, we can tell you after a little bit of investigation, this is what's happening. Obviously, we'd like that to be a lot better, and there's a lot of kind of clearer ways to get there and more speculative ways as well. And then I think a thing that we've talked a lot about is this sort of idea that a lot Part of what the model does isn't simply like, how i",
+        "start": 16500,
+        "end": 16800
+    },
+    {
+        "text": "s it saying the next thing? We talked about it a little bit here. It's like planning a few things again, a few words ahead, sorry. I think we want to understand over a long conversation with the model, how is its understanding of what's happening changing? How is its understanding of who it's talking to changing, and how does that affect its behavior? More and more, the actual use case of models like Cloud is it's going to read a bunch of your documents and a bunch of email addresses.",
+        "start": 16500,
+        "end": 16800
+    },
+    {
+        "text": "or your code, and based on that, it's going to make one suggestion. And so, clearly, there's something really important happening in that space where it's reading all these things. And so I think understanding that better seems like a great challenge to take on. Jack? Yeah, I think we often use the analogy on the team that we're building a microscope to look at the model. And right now, we're in this exciting but also kind of frustrating space where our microscope works like 20% of the time, An",
+        "start": 16800,
+        "end": 17100
+    },
+    {
+        "text": "d looking through it requires a lot of skill. And you have to build this whole big contraption, and infrastructure is always breaking. And then once you've got your explanation of what the model is doing, you have to throw Emmanuel or me or someone else on the team in a room for two hours to puzzle out what exactly was going on. And the really exciting future that I think we could be at within a year or two years, that kind of time scale is one where just every interaction you have with the mode",
+        "start": 16800,
+        "end": 17100
+    },
+    {
+        "text": "l,",
+        "start": 16800,
+        "end": 17100
+    },
+    {
+        "text": "can be under the microscope. Like we can just, there's all these weird things the models are doing and we just want it to be like push of a button, like you're having your conversation, you push a button, you get this flow chart that tells you what it was thinking about. And once we're at that point, it'll be this like, I think the interpretability team at Anthropic, I think will start to kind of take on a bit of a different shape in that instead of this team of kind of like engineers, scientis",
+        "start": 17100,
+        "end": 17400
+    },
+    {
+        "text": "ts thinking about the math of how language models work on the inside, we're going to have this army of biologists that are just looking through the microscope. We're talking to Claude, we're getting it to do weird things, and then we got people looking through the microscope, seeing what it was thinking on the inside, and I think that's the future of this work. Maybe two notes on that. One is we want Claude to help us do all of that, because there's a lot of parts involved. You know who's good a",
+        "start": 17100,
+        "end": 17400
+    },
+    {
+        "text": "t looking at hundreds of things and figuring out what's going on is Claude. And so I think we're trying to enlist some",
+        "start": 17100,
+        "end": 17400
+    },
+    {
+        "text": "help there, especially for these complicated contexts. Maybe the other place is, we've talked a lot about studying the model once it's fully formed, but of course, we're at a company that makes these. So when it says, okay, here's how the model solved this particular problem or said this thing, where did that come from in the training process? What are the steps that made that circuitry form to do that? How could we give feedback to the rest of the company that is doing all of that work to shap",
+        "start": 17400,
+        "end": 17700
+    },
+    {
+        "text": "e the thing that we actually want it to become. Well, thank you so much for the conversation. Where can people find out more about this research? So if you want to find out more, you can go to anthropic.com slash research, which has our papers and blog posts and fun videos about it. Also, we recently partnered with another group called Neuronpedia to host some of these circuit graphs we make. So if you want to try your hand at looking at what's going on inside of a small model, you can go to Neu",
+        "start": 17400,
+        "end": 17700
+    },
+    {
+        "text": "ronpedia and see for yourself. Thank you very much.",
+        "start": 17400,
+        "end": 17700
+    }
+]

@@ -1,0 +1,112 @@
+[
+    {
+        "text": "If you've ever developed a mobile app in the past 10 years, you've probably heard of React Native. At one point, it felt like magic. For nearly a decade, it was the king of mobile applications. But not anymore. In March 2025, ByteDance released something that wasn't supposed to exist. A framework so fast, it made the industry standard look obsolete overnight. 10 percent not 20 but 60 percent faster than react native this is the true story behind the collapse of react native For the last 10 year",
+        "start": 0,
+        "end": 300
+    },
+    {
+        "text": "s, React Native has been the king of mobile applications.",
+        "start": 0,
+        "end": 300
+    },
+    {
+        "text": "It was a masterpiece that finally made cross-platform development viable. Before React Native, we were stuck in the nightmare of maintaining separate iOS and Android codebases. React Native gives us a dream. Learn once, write it anywhere. Developers quickly started using it. Startups earned more money because of it. And big tech companies like Airbnb and Uber built their own businesses around it. It became a standard that everyone followed. But there was a growing frustration that you couldn't",
+        "start": 300,
+        "end": 600
+    },
+    {
+        "text": "ignore. As hardware accelerated, React Native apps started to feel stuck in the past. They were super heavy. Trying to scroll through a complex list often felt like trudging through a mud. We told ourselves that it was native enough, but deep down, we knew it was a compromise. Most of us just accepted that this was the price of doing business, but one company refused to settle. Obsessed with performance they did not want a patch, they wanted",
+        "start": 300,
+        "end": 600
+    },
+    {
+        "text": "a new foundation. They weren't just building a competitor, they were building an executioner. The company is ByteDance. You know them as the owner of TikTok. You see, TikTok is not a normal app. It is a monster of data. It serves billions of users, processing endless streams of high definition video while tracking likes, comments, and shares in real time. If the interface lags for even a millisecond, users fall away. For a long time, ByteDance tried to use existing tools to build their own apps",
+        "start": 600,
+        "end": 900
+    },
+    {
+        "text": ", but they hit a wall. The existing frameworks were designed for standard apps, not for high-performance video-first monsters like TikTok. So they faced a choice, slow down their growth or build their own engine. They decided to build their own engine. They started to work on a secret project. They did not build it for the public, they used it to power TikTok and the Chinese version Duyuan.",
+        "start": 600,
+        "end": 900
+    },
+    {
+        "text": "it on the world's most demanding audience. They scrubbed every efficiency, polished every frame, and by the time they were done, they realized they had created something that the world had never seen before. So in March 2025, they released it to the world, and they called it Lynx. Understand why Lynx is a major challenge? You have to first understand a few concepts about react native normally you have to write separate code for android using kotlin or java and for ios you can use swift or objec",
+        "start": 900,
+        "end": 1200
+    },
+    {
+        "text": "tive c which means double the work with react native however you write your apps using javascript a language originally designed for the web not for android or ios this raises an important question then how does javascript runs on the mobile platform To answer this question, you have to go back way back into the older days where there was the concept of bridge in react native in the old way your JavaScript code gets",
+        "start": 900,
+        "end": 1200
+    },
+    {
+        "text": "bundle into one file using a tool called metro. This bundle runs in your phone. Then there are two worlds. JavaScript runs in its own virtual machine like mini computer inside the app. Native code runs directly in your phone for the actual buttons and screen. Now the problem is that these two do not speak the same language. So they communicate via the bridge. JavaScript sends instruction as simple messages in a JSON format over the bridge. The native side reads them and build the real UI. It's",
+        "start": 1200,
+        "end": 1500
+    },
+    {
+        "text": "like two friends speaking different languages using a translator. Messages go back and forth but it's an asynchronous operation meaning not instant operation. To keep the app smooth React Native splits work across multiple threads each responsible for different parts of the process. Threads are like workers handling tasks. There is a UI thread which handles what you see and touch there is a JavaScript thread which runs your apps logic and finally there is a",
+        "start": 1200,
+        "end": 1500
+    },
+    {
+        "text": "shadow thread which calculates layouts such as positions, sizes, and so on and so forth using a tool called Yoga which understands CSS-like styles since native does not. The goal was to keep the UI thread free so that the app feel responsive. These delays blocks the UI, make animation choppy, and hurt the user experience. Plus, converting messages like serialization and deserialization takes time and uses extra power and memory. To fix this, React Native got a big upgrade. No more bridge. Now i",
+        "start": 1500,
+        "end": 1800
+    },
+    {
+        "text": "t's bridgeless for faster and direct communication. It introduced a few new concepts such as JSI, which is a JavaScript interface written in C++. Fabric, which is a new rendering system, also written in C++. Turbo modules, in the old way, all extra features like modules loaded at the app start even unused ones slowing the launch now they load only when needed which is called lazy",
+        "start": 1500,
+        "end": 1800
+    },
+    {
+        "text": "loading saving time and memory although react native new architecture like fabric plus turbo modules reduces some of these issues but cross-thread communication and abstraction layers still exist on the other hand there is links links eliminate the javascript bridge entirely ui code is compiled directly into native rendering instruction no more intermediate serialization layer no virtual dom reconciliation steps ui updates are issued synchronously where possible. This architecture is referred t",
+        "start": 1800,
+        "end": 2100
+    },
+    {
+        "text": "o as direct-to-native rendering, and it significantly reduces update latency and frame drops. Lynx's core runtime, rendering pipeline, and tooling are implemented in Rust. This provides predictable performance, memory safety without garbage collection pauses, strong concurrency guarantees, lower crash risk compared to legacy C++ and GC heavy runtime. React net you primarily relies on C++ and JavaScript engines which requires",
+        "start": 1800,
+        "end": 2100
+    },
+    {
+        "text": "more defensive memory management and synchronization. Lynx also uses a strictly separated dual-thread execution model. There is a main thread or UI thread, which handles layout, rendering, animations, gestures, runs on a lightweight JavaScript engine, PrimJS, which is based on a QuickJS. It is optimized exclusively for UI responsiveness. Then there is a background thread, which handles business logic, network requests, data processing heavy computation, uses JavaScript core for iOS, or primjs f",
+        "start": 2100,
+        "end": 2400
+    },
+    {
+        "text": "or the Android. Developers can now explicitly annotate execution context, main thread for the UI critical logic, background only for the non-UI work. This guarantees that expensive background operation cannot block the UI rendering. This makes Lynx especially competitive for performance-critical applications involving complex animations, gestures, and high-frequency UI updates. For years, there has been a divide between web developers and mobile developers.",
+        "start": 2100,
+        "end": 2400
+    },
+    {
+        "text": "They speak different languages. If the web developer wanted to build a mobile app, they had to learn React Native's specific limited version of styling. They couldn't just use their own genuine CSS. They had to learn something called Style Shield. They had to learn new rules. It was a barrier that kept millions of talented web developers out of the mobile game. Lynx tore that barrier down. They made a bold promise. Genuine CSS. not a simplified copy the real deal animations transitions shadows",
+        "start": 2400,
+        "end": 2700
+    },
+    {
+        "text": "complex selectors everything you can think about the css if you can write it for the web you can write it for the links app also while react native forces you to use react framework links is a framework agnostic right now it works with react but the engine does not care in the future you could potentially use therefore the view angular or svelte links isn't just a new tool it is a new invitation to every developer",
+        "start": 2400,
+        "end": 2700
+    },
+    {
+        "text": "on the internet so with all the speed and freedom the question is why isn't everyone switching because there is one thing react native has that links does not which is history react native has been around for 10 years in that time the community has built everything you need a map there is a library for that you need a payment gateway it's already there you need a chart someone built it yesterday this is the ecosystem it's a massive safety net links is new its library shelves are mostly empty if",
+        "start": 2700,
+        "end": 3000
+    },
+    {
+        "text": "you choose links you might get faster apps but you might have to build the basic tools yourself for a big company that is a scary risk so let's talk about a million dollar question did links destroyed react native well not yet but it will let me explain for application where Their performance is everything, social radio feeds, intensive games.",
+        "start": 2700,
+        "end": 3000
+    },
+    {
+        "text": "tools, Lynx is going to dominate. It is simply too fast to ignore. For standard business apps, bankings, and utilities, where stability matters more than a split-second animation, React Native will likely remain the king for a long time. But the real victory here isn't just about for ByteDance or Meta, it is for us. This competition forces the entire industry to evolve. It forces Meta to stop resting and improve their products. It forces tools to get faster, It forces companies to respect the u",
+        "start": 3000,
+        "end": 3300
+    },
+    {
+        "text": "ser's time. The era of good enough is over. The bar has been raised. And because of this battle, the apps on your phone are about to get a whole lot faster.",
+        "start": 3000,
+        "end": 3300
+    }
+]
