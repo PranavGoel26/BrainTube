@@ -1,7 +1,10 @@
 FROM python:3.11-slim
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y ffmpeg curl && rm -rf /var/lib/apt/lists/*
+# Install system dependencies including Rust build tools for fastembed 
+RUN apt-get update && apt-get install -y ffmpeg curl gcc python3-dev rustc cargo && rm -rf /var/lib/apt/lists/*
+
+# Fix Render RO-filesystem issues by setting CARGO_HOME to /tmp
+ENV CARGO_HOME=/tmp/.cargo
 
 # Set working directory
 WORKDIR /app
