@@ -1,144 +1,3 @@
-
-
-
-
-# import yt_dlp
-# from youtube_transcript_api import YouTubeTranscriptApi
-
-# from cache_utils import transcript_exists, load_transcript, save_transcript
-
-
-# # ---------------------------
-# # Extract video ID
-# # ---------------------------
-# def get_video_id(url):
-
-#     if "watch?v=" in url:
-#         return url.split("watch?v=")[1].split("&")[0]
-
-#     if "youtu.be/" in url:
-#         return url.split("youtu.be/")[1].split("?")[0]
-
-#     return None
-
-
-# # ---------------------------
-# # Try getting captions
-# # ---------------------------
-# def get_captions(video_id):
-
-#     try:
-
-#         transcript = YouTubeTranscriptApi.get_transcript(video_id)
-
-#         formatted = []
-
-#         for seg in transcript:
-
-#             formatted.append({
-#                 "start": seg["start"],
-#                 "end": seg["start"] + seg["duration"],
-#                 "text": seg["text"]
-#             })
-
-#         return formatted
-
-#     except Exception:
-
-#         return None
-
-
-# # ---------------------------
-# # Download audio if no captions
-# # ---------------------------
-# def download_audio(url):
-
-#     output = "temp_audio.wav"
-
-#     ydl_opts = {
-#         "format": "bestaudio/best",
-#         "outtmpl": "temp_audio.%(ext)s",
-#         "postprocessors": [{
-#             "key": "FFmpegExtractAudio",
-#             "preferredcodec": "wav",
-#             "preferredquality": "192"
-#         }]
-#     }
-
-#     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-#         ydl.download([url])
-
-#     return output
-
-
-# # ---------------------------
-# # Main ingestion pipeline
-# # ---------------------------
-# def process_youtube(url, transcribe_audio_chunks):
-
-#     video_id = get_video_id(url)
-
-#     if video_id is None:
-#         raise ValueError("Invalid YouTube URL")
-
-#     # ----------------------------------
-#     # 1️⃣ Check cache first
-#     # ----------------------------------
-#     if transcript_exists(video_id):
-
-#         print("Transcript loaded from cache")
-
-#         transcript = load_transcript(video_id)
-
-#         return transcript
-
-#     print("Checking YouTube captions...")
-
-#     # ----------------------------------
-#     # 2️⃣ Try captions
-#     # ----------------------------------
-#     captions = get_captions(video_id)
-
-#     if captions:
-
-#         print("Captions found — skipping Whisper")
-
-#         save_transcript(video_id, captions)
-
-#         return captions
-
-#     # ----------------------------------
-#     # 3️⃣ Fallback to Whisper
-#     # ----------------------------------
-#     print("No captions found — downloading audio")
-
-#     audio_path = download_audio(url)
-
-#     print("Splitting audio into chunks...")
-
-#     from transcription import split_audio
-
-#     chunks_folder = split_audio(audio_path)
-
-#     print("Transcribing audio chunks...")
-
-#     transcript = transcribe_audio_chunks(chunks_folder)
-
-#     # Ensure transcript format is correct
-#     if not isinstance(transcript, list):
-#         raise ValueError("Transcription returned invalid format")
-
-#     save_transcript(video_id, transcript)
-
-#     return transcript
-
-
-
-
-
-
-
-
 import yt_dlp
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
@@ -219,11 +78,11 @@ def get_captions(video_id):
 # ----------------------------------
 def download_audio(url):
 
-    output = "temp_audio.wav"
+    output = "/tmp/temp_audio.wav"
 
     ydl_opts = {
         "format": "bestaudio/best",
-        "outtmpl": "temp_audio.%(ext)s",
+        "outtmpl": "/tmp/temp_audio.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "wav",

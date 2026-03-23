@@ -23,7 +23,11 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    #allow_origins=["*"],
+    allow_origins=[
+        "https://brain-tube-jvlrvxeld-pranav-s-projects-a5dd49ac.vercel.app",
+        "http://localhost:8080" # Keeping localhost so you can still test locally!
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -89,7 +93,7 @@ async def process_video(request: VideoRequest):
 async def upload_local_video(file: UploadFile = File(...)):
     try:
         # Save uploaded file temporarily
-        file_location = f"temp_{file.filename}"
+        file_location = f"/tmp/temp_{file.filename}"
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
             

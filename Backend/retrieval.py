@@ -1,14 +1,16 @@
 import faiss
 import json
+import os
 import numpy as np
 import torch
 import hashlib
-from sentence_transformers import SentenceTransformer
+from fastembed import TextEmbedding
 from keyword_search import build_bm25_index, keyword_search
 from reranker import rerank
 from query_expansion import generate_queries
+from gcs_utils import download_from_gcs
 
-VECTOR_DIR = "vector_store"
+VECTOR_DIR = "/tmp/vector_store"
 
 def get_video_paths(video_id: str):
     safe_name = hashlib.md5(video_id.encode()).hexdigest()
@@ -16,12 +18,19 @@ def get_video_paths(video_id: str):
     return f"{base_dir}/faiss_index.bin", f"{base_dir}/metadata.json"
 
 print("Loading embedding model...")
-device = "mps" if torch.backends.mps.is_available() else "cpu"
-model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2", device=device)
-print("Embedding model running on:", device)
+model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+print("Embedding model loaded via fastembed (CPU ONNX)")
 
 def get_index_and_metadata(video_id):
     index_path, meta_path = get_video_paths(video_id)
+    
+    # Try downloading from GCS first if missing locally
+    if not os.path.exists(index_path) or not os.path.exists(meta_path):
+        import hashlib
+        safe_name = hashlib.md5(video_id.encode()).hexdigest()
+        download_from_gcs(f"vector_store/{safe_name}/faiss_index.bin", index_path)
+        download_from_gcs(f"vector_store/{safe_name}/metadata.json", meta_path)
+
     try:
         index = faiss.read_index(index_path)
         with open(meta_path, "r") as f:
@@ -33,8 +42,9 @@ def get_index_and_metadata(video_id):
         return None, None, None
 
 def embed_query(query):
-    query_embedding = model.encode([query])
-    return np.array(query_embedding).astype("float32")
+    embeddings_generator = model.embed([query])
+    query_embedding = list(embeddings_generator)[0]
+    return np.array([query_embedding]).astype("float32")
 
 def vector_search(query, index, chunks, top_k=5):
     query_embedding = embed_query(query)

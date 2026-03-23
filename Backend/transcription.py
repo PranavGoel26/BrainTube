@@ -14,7 +14,7 @@ client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 # ======================================
 # Extract audio from video
 # ======================================
-def extract_audio(video_path, output_audio_path="temp_audio.wav"):
+def extract_audio(video_path, output_audio_path="/tmp/temp_audio.wav"):
 
     video = VideoFileClip(video_path)
     video.audio.write_audiofile(output_audio_path)
@@ -27,7 +27,7 @@ def extract_audio(video_path, output_audio_path="temp_audio.wav"):
 # ======================================
 def split_audio(audio_path, chunk_length=60):
 
-    os.makedirs("audio_chunks", exist_ok=True)
+    os.makedirs("/tmp/audio_chunks", exist_ok=True)
 
     command = [
         "ffmpeg",
@@ -35,12 +35,12 @@ def split_audio(audio_path, chunk_length=60):
         "-f", "segment",
         "-segment_time", str(chunk_length),
         "-c", "copy",
-        "audio_chunks/chunk_%03d.wav"
+        "/tmp/audio_chunks/chunk_%03d.wav"
     ]
 
     subprocess.run(command)
 
-    return "audio_chunks"
+    return "/tmp/audio_chunks"
 
 
 # ======================================
@@ -119,7 +119,7 @@ def transcribe_audio_chunks(folder, max_workers=3):
 # ======================================
 # Save transcript
 # ======================================
-def save_transcript(transcript, output_file="transcript.json"):
+def save_transcript(transcript, output_file="/tmp/transcript.json"):
 
     with open(output_file, "w") as f:
         json.dump(transcript, f, indent=4)

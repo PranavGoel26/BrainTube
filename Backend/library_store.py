@@ -1,14 +1,18 @@
 import json
 import os
 from typing import List, Dict, Any
+from gcs_utils import download_from_gcs, upload_to_gcs
 
-LIBRARY_FILE = "data/library.json"
+LIBRARY_FILE = "/tmp/data/library.json"
+GCS_BLOB_NAME = "data/library.json"
 
 def init_library() -> None:
-    os.makedirs("data", exist_ok=True)
+    os.makedirs("/tmp/data", exist_ok=True)
     if not os.path.exists(LIBRARY_FILE):
-        with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
-            json.dump([], f)
+        success = download_from_gcs(GCS_BLOB_NAME, LIBRARY_FILE)
+        if not success:
+            with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
+                json.dump([], f)
 
 def get_library() -> List[Dict[str, Any]]:
     init_library()
@@ -27,6 +31,7 @@ def add_to_library(video_data: Dict[str, Any]) -> None:
         
     with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
         json.dump(lib, f, indent=2)
+    upload_to_gcs(LIBRARY_FILE, GCS_BLOB_NAME)
 
 def remove_from_library(video_url: str) -> bool:
     lib = get_library()
@@ -35,4 +40,5 @@ def remove_from_library(video_url: str) -> bool:
         return False  # Not found
     with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
         json.dump(new_lib, f, indent=2)
+    upload_to_gcs(LIBRARY_FILE, GCS_BLOB_NAME)
     return True
