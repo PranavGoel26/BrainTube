@@ -5,12 +5,14 @@ RUN apt-get update && apt-get install -y ffmpeg curl gcc python3-dev rustc cargo
 
 # Fix Render RO-filesystem issues by setting CARGO_HOME to /tmp
 ENV CARGO_HOME=/tmp/.cargo
+RUN mkdir -p /tmp/.cargo
 
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and install
+# Upgrade pip and install requirements
 COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
