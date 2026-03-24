@@ -25,7 +25,7 @@ app.add_middleware(
     CORSMiddleware,
     #allow_origins=["*"],
     allow_origins=[
-        "https://brain-tube-jvlrvxeld-pranav-s-projects-a5dd49ac.vercel.app",
+        "https://brain-tube.vercel.app",
         "http://localhost:8080" # Keeping localhost so you can still test locally!
     ],
     allow_credentials=True,
