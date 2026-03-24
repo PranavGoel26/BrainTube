@@ -26,7 +26,9 @@ app.add_middleware(
     #allow_origins=["*"],
     allow_origins=[
         "https://brain-tube.vercel.app",
-        "http://localhost:8080" # Keeping localhost so you can still test locally!
+        "http://localhost:8080",
+        "http://localhost:8081",
+        "http://localhost:5173" # Keeping localhost so you can still test locally!
     ],
     allow_credentials=True,
     allow_methods=["*"],

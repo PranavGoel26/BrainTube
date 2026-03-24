@@ -1,0 +1,2 @@
+# Export your YouTube cookies from your browser and paste them here.
+# A browser extension like "Get cookies.txt LOCALLY" can be used for this.

@@ -87,7 +87,8 @@ def download_audio(url):
             "key": "FFmpegExtractAudio",
             "preferredcodec": "wav",
             "preferredquality": "192"
-        }]
+        }],
+        "cookiefile": "cookies.txt"
     }
 
     print("Downloading audio...")
