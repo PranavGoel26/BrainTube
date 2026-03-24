@@ -1,4 +1,5 @@
 import yt_dlp
+import os
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
 
@@ -80,6 +81,8 @@ def download_audio(url):
 
     output = "/tmp/temp_audio.wav"
 
+    cookie_path = "/etc/secrets/cookies.txt" if os.path.exists("/etc/secrets/cookies.txt") else "cookies.txt"
+
     ydl_opts = {
         "format": "bestaudio/best",
         "outtmpl": "/tmp/temp_audio.%(ext)s",
@@ -88,7 +91,7 @@ def download_audio(url):
             "preferredcodec": "wav",
             "preferredquality": "192"
         }],
-        "cookiefile": "cookies.txt"
+        "cookiefile": cookie_path
     }
 
     print("Downloading audio...")
