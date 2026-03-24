@@ -13,3 +13,4 @@ Backend/chunks.json
 Backend/chunks_metadata.json
 Backend/vector_store/
 Backend/audio_chunks/
+Backend/cookies.txt
