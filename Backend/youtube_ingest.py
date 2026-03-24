@@ -81,7 +81,11 @@ def download_audio(url):
 
     output = "/tmp/temp_audio.wav"
 
-    cookie_path = "/etc/secrets/cookies.txt" if os.path.exists("/etc/secrets/cookies.txt") else "cookies.txt"
+    cookie_path = "cookies.txt"
+    if os.path.exists("/etc/secrets/cookies.txt"):
+        import shutil
+        shutil.copy("/etc/secrets/cookies.txt", "/tmp/cookies.txt")
+        cookie_path = "/tmp/cookies.txt"
 
     ydl_opts = {
         "format": "bestaudio/best",
