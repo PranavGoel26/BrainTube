@@ -7,6 +7,10 @@ RUN apt-get update && apt-get install -y ffmpeg curl gcc python3-dev rustc cargo
 ENV CARGO_HOME=/tmp/.cargo
 RUN mkdir -p /tmp/.cargo
 
+# Ensure JS runtimes are fully locatable by yt-dlp 
+ENV PATH="/usr/bin/node:${PATH}"
+RUN ln -sf /usr/bin/nodejs /usr/bin/node || true
+
 # Set working directory
 WORKDIR /app
 

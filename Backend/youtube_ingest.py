@@ -104,7 +104,10 @@ def download_audio(url):
         },
         "format_sort": ["res:720", "vcodec:h264", "acodec:m4a"],
         "allow_unplayable_formats": True,
-        "ignoreerrors": True
+        "ignoreerrors": True,
+        "javascript_runtimes": ["node"],
+        "proxy": None,
+        "source_address": "0.0.0.0"
     }
 
     print("Downloading audio...")
