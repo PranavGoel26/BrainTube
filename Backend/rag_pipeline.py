@@ -33,5 +33,5 @@ def ask_question(question, video_id, history=None):
     except Exception:
         return {
             "status": "error",
-            "message": "Error: This video has not been processed successfully yet. Please try analyzing it again."
+            "message": "I'm sorry, I couldn't process this video's audio. Please try another video or check the logs for download errors."
         }

@@ -88,13 +88,15 @@ def download_audio(url):
         cookie_path = "/tmp/cookies.txt"
 
     ydl_opts = {
+        "format": "ba/b",
         "outtmpl": "/tmp/temp_audio.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "m4a",
             "preferredquality": "192"
         }],
-        "cookiefile": "cookies.txt",
+        "cookiefile": cookie_path,
+        "ffmpeg_location": "/usr/bin/ffmpeg",
         "verbose": True,
         "extractor_args": {
             "youtube": {
@@ -114,6 +116,16 @@ def download_audio(url):
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
+
+    import glob
+    files = glob.glob("/tmp/temp_audio.*")
+    if files:
+        for f in files:
+            if f != output:
+                os.rename(f, output)
+                break
+    else:
+        print("Warning: yt-dlp finished but no /tmp/temp_audio files found.")
 
     return output
 

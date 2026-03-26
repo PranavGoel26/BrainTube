@@ -35,6 +35,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event('startup')
+async def startup_event():
+    import shutil
+    print(f'Node Path: {shutil.which("node")}')
+
 class VideoRequest(BaseModel):
     url: str
 
@@ -219,10 +224,10 @@ async def generate_quiz(request: QuizRequest):
         try:
             index, chunks, bm25 = get_index_and_metadata(request.video_url)
         except Exception:
-            return {"error": "Error: This video has not been processed successfully yet. Please try analyzing it again."}
+            return {"error": "I'm sorry, I couldn't process this video's audio. Please try another video or check the logs for download errors."}
 
         if not chunks:
-             return {"error": "Error: This video has not been processed successfully yet. Please try analyzing it again."}
+             return {"error": "I'm sorry, I couldn't process this video's audio. Please try another video or check the logs for download errors."}
             
         lib = get_library()
             
