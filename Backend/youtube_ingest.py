@@ -88,7 +88,6 @@ def download_audio(url):
         cookie_path = "/tmp/cookies.txt"
 
     ydl_opts = {
-        "format": "bestvideo+bestaudio/best",
         "outtmpl": "/tmp/temp_audio.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
@@ -96,7 +95,16 @@ def download_audio(url):
             "preferredquality": "192"
         }],
         "cookiefile": "cookies.txt",
-        "verbose": True
+        "verbose": True,
+        "extractor_args": {
+            "youtube": {
+                "player_client": ["android", "web"],
+                "skip": ["dash", "hls"]
+            }
+        },
+        "format_sort": ["res:720", "vcodec:h264", "acodec:m4a"],
+        "allow_unplayable_formats": True,
+        "ignoreerrors": True
     }
 
     print("Downloading audio...")
