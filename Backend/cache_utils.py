@@ -1,7 +1,7 @@
 import os
 import json
 
-CACHE_DIR = "cache/transcripts"
+CACHE_DIR = "/tmp/cache/transcripts"
 
 
 def get_cache_path(video_id):
