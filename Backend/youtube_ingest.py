@@ -88,14 +88,15 @@ def download_audio(url):
         cookie_path = "/tmp/cookies.txt"
 
     ydl_opts = {
-        "format": "bestaudio/best",
+        "format": "bestvideo+bestaudio/best",
         "outtmpl": "/tmp/temp_audio.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
             "preferredcodec": "wav",
             "preferredquality": "192"
         }],
-        "cookiefile": cookie_path
+        "cookiefile": "cookies.txt",
+        "verbose": True
     }
 
     print("Downloading audio...")
