@@ -16,6 +16,13 @@ export default function Summaries() {
 
   useEffect(() => {
     loadVideos();
+    const interval = setInterval(() => {
+      // Quiet polling for processing status
+      fetchVideos()
+        .then(data => setVideos(data.reverse()))
+        .catch(console.error);
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadVideos = async () => {
@@ -28,7 +35,7 @@ export default function Summaries() {
       if (targetUrl) {
           const idx = reversed.findIndex((v: any) => v.url === targetUrl);
           if (idx !== -1) setExpanded(idx);
-      } else if (reversed.length > 0) {
+      } else if (reversed.length > 0 && reversed[0].analyzed !== false) {
           setExpanded(0);
       }
     } catch (err) {
@@ -46,13 +53,16 @@ export default function Summaries() {
           <p className="text-sm text-muted-foreground">AI-generated summaries of your analyzed videos.</p>
         </motion.div>
 
-        {isLoading ? (
+        {isLoading && videos.length === 0 ? (
              <div className="flex justify-center p-20"><Loader2 className="animate-spin text-primary h-8 w-8" /></div>
         ) : videos.length === 0 ? (
              <div className="glass-panel p-12 text-center text-muted-foreground">No videos processed yet.</div>
         ) : (
             <div className="space-y-4">
-              {videos.map((v, i) => (
+              {videos.map((v, i) => {
+                const isProcessing = v.analyzed === false;
+                
+                return (
                 <motion.div
                   key={v.url + i}
                   initial={{ opacity: 0, y: 20 }}
@@ -61,23 +71,33 @@ export default function Summaries() {
                   className="glass-panel overflow-hidden"
                 >
                   <button
-                    onClick={() => setExpanded(expanded === i ? null : i)}
-                    className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-muted/10 transition-colors"
+                    onClick={() => { if (!isProcessing) setExpanded(expanded === i ? null : i) }}
+                    className={`w-full flex items-center justify-between p-4 sm:p-5 text-left transition-colors ${!isProcessing ? 'hover:bg-muted/10 cursor-pointer' : 'cursor-default'}`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
                       <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
-                        <FileText className="h-5 w-5 text-primary" />
+                        {isProcessing ? (
+                          <Loader2 className="h-5 w-5 text-primary animate-spin" />
+                        ) : (
+                          <FileText className="h-5 w-5 text-primary" />
+                        )}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 pr-4">
                         <p className="font-medium text-foreground truncate">{v.title}</p>
                         <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                          <Clock className="h-3 w-3" /> Duration: {v.duration}
+                          {isProcessing ? (
+                            <span className="text-primary font-medium animate-pulse">Processing Video...</span>
+                          ) : (
+                            <><Clock className="h-3 w-3" /> Duration: {v.duration}</>
+                          )}
                         </p>
                       </div>
                     </div>
-                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform flex-shrink-0 ml-2 ${expanded === i ? 'rotate-180' : ''}`} />
+                    {!isProcessing && (
+                      <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform flex-shrink-0 ml-2 ${expanded === i ? 'rotate-180' : ''}`} />
+                    )}
                   </button>
-                  {expanded === i && (
+                  {expanded === i && !isProcessing && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
@@ -102,7 +122,7 @@ export default function Summaries() {
                     </motion.div>
                   )}
                 </motion.div>
-              ))}
+              )})}
             </div>
         )}
       </div>
