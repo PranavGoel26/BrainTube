@@ -216,14 +216,15 @@ async def explanation(request: ChatRequest):
 @app.post("/api/quiz")
 async def generate_quiz(request: QuizRequest):
     try:
-        lib = get_library()
-        video = next((v for v in lib if v["url"] == request.video_url), None)
-        if not video:
-            raise HTTPException(status_code=404, detail="Video not found in library.")
-        
-        index, chunks, bm25 = get_index_and_metadata(request.video_url)
+        try:
+            index, chunks, bm25 = get_index_and_metadata(request.video_url)
+        except Exception:
+            return {"error": "Error: This video has not been processed successfully yet. Please try analyzing it again."}
+
         if not chunks:
-            raise HTTPException(status_code=404, detail="Transcript chunks not found for this video.")
+             return {"error": "Error: This video has not been processed successfully yet. Please try analyzing it again."}
+            
+        lib = get_library()
             
         num_questions = min(10, max(5, len(chunks) // 2))
         transcript_sample = " ".join([c["text"] for c in chunks[:15]])
@@ -245,4 +246,9 @@ async def generate_quiz(request: QuizRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
+    import subprocess
+    try:
+        print("Node version Check:", subprocess.getoutput('node -v'))
+    except Exception:
+        pass
     uvicorn.run("main:app", host="0.0.0.0", port=10000, reload=True)

@@ -91,7 +91,7 @@ def download_audio(url):
         "outtmpl": "/tmp/temp_audio.%(ext)s",
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
-            "preferredcodec": "wav",
+            "preferredcodec": "m4a",
             "preferredquality": "192"
         }],
         "cookiefile": "cookies.txt",
@@ -105,7 +105,7 @@ def download_audio(url):
         "format_sort": ["res:720", "vcodec:h264", "acodec:m4a"],
         "allow_unplayable_formats": True,
         "ignoreerrors": True,
-        "javascript_runtimes": ["node"],
+        "javascript_runtimes": ["node", "nodejs"],
         "proxy": None,
         "source_address": "0.0.0.0"
     }

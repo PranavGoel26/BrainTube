@@ -10,6 +10,7 @@ RUN mkdir -p /tmp/.cargo
 # Ensure JS runtimes are fully locatable by yt-dlp 
 ENV PATH="/usr/bin/node:${PATH}"
 RUN ln -sf /usr/bin/nodejs /usr/bin/node || true
+RUN which node && node -v
 
 # Set working directory
 WORKDIR /app
