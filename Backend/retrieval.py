@@ -2,9 +2,7 @@ import faiss
 import json
 import os
 import numpy as np
-import torch
 import hashlib
-from fastembed import TextEmbedding
 from keyword_search import build_bm25_index, keyword_search
 from reranker import rerank
 from query_expansion import generate_queries
@@ -16,10 +14,6 @@ def get_video_paths(video_id: str):
     safe_name = hashlib.md5(video_id.encode()).hexdigest()
     base_dir = f"{VECTOR_DIR}/{safe_name}"
     return f"{base_dir}/faiss_index.bin", f"{base_dir}/metadata.json"
-
-print("Loading embedding model...")
-model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
-print("Embedding model loaded via fastembed (CPU ONNX)")
 
 def get_index_and_metadata(video_id):
     index_path, meta_path = get_video_paths(video_id)
@@ -42,7 +36,8 @@ def get_index_and_metadata(video_id):
         return None, None, None
 
 def embed_query(query):
-    embeddings_generator = model.embed([query])
+    from embeddings import get_model
+    embeddings_generator = get_model().embed([query])
     query_embedding = list(embeddings_generator)[0]
     return np.array([query_embedding]).astype("float32")
 

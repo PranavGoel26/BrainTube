@@ -3,7 +3,6 @@ import json
 import faiss
 import numpy as np
 import hashlib
-from fastembed import TextEmbedding
 from gcs_utils import download_from_gcs, upload_to_gcs, delete_from_gcs
 
 VECTOR_DIR = "/tmp/vector_store"
@@ -15,6 +14,7 @@ def get_video_paths(video_id: str):
     return f"{base_dir}/faiss_index.bin", f"{base_dir}/metadata.json"
 
 def load_embedding_model():
+    from fastembed import TextEmbedding
     model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
     print("Embedding model loaded via fastembed (CPU ONNX)")
     return model
