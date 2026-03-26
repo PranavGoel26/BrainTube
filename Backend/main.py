@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
 import shutil
 import os
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,8 +46,45 @@ class ChatRequest(BaseModel):
 class QuizRequest(BaseModel):
     video_url: str
 
+def background_process_video(url, title, channel, duration_str):
+    try:
+        transcript = process_youtube(url, transcribe_audio_chunks)
+        chunks = create_chunks(transcript)
+        add_to_vector_database(chunks, url)
+        
+        # Scaled Summary Generation
+        transcript_text = " ".join([seg["text"] for seg in transcript])
+        summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text[:10000]}"
+        summary_text = generate_general_explanation(summary_query)
+        
+        # Save to library as completed
+        add_to_library({
+            "id": url,
+            "url": url,
+            "title": title,
+            "channel": channel,
+            "duration": duration_str,
+            "analyzed": True,
+            "summary": summary_text,
+            "thumbnail": "from-primary/30 to-accent/10"
+        })
+    except Exception as e:
+        print(f"Background processing failed for {url}: {e}")
+    finally:
+        import shutil
+        # Cleanup temporary audio files and chunks (Zombie Files)
+        for ext in ['wav', 'webm', 'm4a', 'mp4']:
+            temp_file = f"/tmp/temp_audio.{ext}"
+            if os.path.exists(temp_file):
+                try:
+                    os.remove(temp_file)
+                except Exception:
+                    pass
+        if os.path.exists("/tmp/audio_chunks"):
+            shutil.rmtree("/tmp/audio_chunks", ignore_errors=True)
+
 @app.post("/api/process_video")
-async def process_video(request: VideoRequest):
+async def process_video(request: VideoRequest, background_tasks: BackgroundTasks):
     try:
         try:
             with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
@@ -66,28 +103,22 @@ async def process_video(request: VideoRequest):
             channel = "Unknown Channel"
             duration_str = "0:00"
 
-        transcript = process_youtube(request.url, transcribe_audio_chunks)
-        chunks = create_chunks(transcript)
-        add_to_vector_database(chunks, request.url)
-        
-        # Scaled Summary Generation
-        transcript_text = " ".join([seg["text"] for seg in transcript])
-        summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text[:10000]}" # clip to 10000 chars roughly to avoid token overflow
-        summary_text = generate_general_explanation(summary_query)
-        
-        # Save to library
+        # Add to library as 'Processing' immediately
         add_to_library({
             "id": request.url,
             "url": request.url,
             "title": title,
             "channel": channel,
             "duration": duration_str,
-            "analyzed": True,
-            "summary": summary_text,
+            "analyzed": False,
+            "summary": "This video is currently being analyzed by BrainTube. It usually takes less than 30 seconds. Please refresh the page in a moment.",
             "thumbnail": "from-primary/30 to-accent/10"
         })
+
+        # Process in background
+        background_tasks.add_task(background_process_video, request.url, title, channel, duration_str)
         
-        return {"status": "success", "message": "Video processed successfully.", "chunks_created": len(chunks)}
+        return {"status": "success", "message": "Video analysis started in the background.", "url": request.url}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

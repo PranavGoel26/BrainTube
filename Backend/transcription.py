@@ -27,14 +27,25 @@ def extract_audio(video_path, output_audio_path="/tmp/temp_audio.wav"):
 # ======================================
 def split_audio(audio_path, chunk_length=60):
 
+    if not os.path.exists(audio_path):
+        import glob
+        # Fallback check if it got saved with a different extension (e.g. .webm or .m4a)
+        possible_files = glob.glob("/tmp/temp_audio.*")
+        if possible_files:
+            audio_path = possible_files[0]
+            print(f"Found alternative audio path: {audio_path}")
+        else:
+            raise FileNotFoundError(f"Audio file not found at {audio_path}. yt-dlp extraction likely failed or was skipped.")
+
     os.makedirs("/tmp/audio_chunks", exist_ok=True)
 
     command = [
         "ffmpeg",
         "-i", audio_path,
+        "-ar", "16000",
+        "-ac", "1",
         "-f", "segment",
         "-segment_time", str(chunk_length),
-        "-c", "copy",
         "/tmp/audio_chunks/chunk_%03d.wav"
     ]
 

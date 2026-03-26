@@ -23,7 +23,7 @@ model = load_embedding_model()
 
 def generate_embeddings(chunks):
     texts = [chunk["text"] for chunk in chunks]
-    embeddings_generator = model.embed(texts)
+    embeddings_generator = model.embed(texts, batch_size=32)
     embeddings = list(embeddings_generator)
     return np.array(embeddings).astype("float32")
 
