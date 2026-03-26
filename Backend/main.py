@@ -38,6 +38,10 @@ app.add_middleware(
 class VideoRequest(BaseModel):
     url: str
 
+@app.get("/")
+async def root_health_check():
+    return {"status": "ok"}
+
 class ChatRequest(BaseModel):
     query: str
     video_url: Optional[str] = None
@@ -241,4 +245,4 @@ async def generate_quiz(request: QuizRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=10000, reload=True)

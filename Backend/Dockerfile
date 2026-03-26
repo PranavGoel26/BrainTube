@@ -19,8 +19,8 @@ RUN pip install --no-cache-dir -U yt-dlp
 # Copy application code
 COPY . .
 
-# Cloud Run sets the PORT environment variable. Default to 8080.
-ENV PORT 8080
+# Cloud Run sets the PORT environment variable. Default to 10000.
+ENV PORT 10000
 
 # Command to run the FastApi application
 CMD uvicorn main:app --host 0.0.0.0 --port $PORT
