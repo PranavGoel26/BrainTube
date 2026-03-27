@@ -13,19 +13,20 @@ def get_video_paths(video_id: str):
     os.makedirs(base_dir, exist_ok=True)
     return f"{base_dir}/faiss_index.bin", f"{base_dir}/metadata.json"
 
-def load_embedding_model():
-    from fastembed import TextEmbedding
-    model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
-    print("Embedding model loaded via fastembed (CPU ONNX)")
-    return model
+class EmbeddingModelSingleton:
+    _instance = None
 
-model = None
+    @classmethod
+    def get_instance(cls):
+        if cls._instance is None:
+            print("[SYSTEM] AI Engine Ignited")
+            from fastembed import TextEmbedding
+            cls._instance = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
+            print("Embedding model loaded via fastembed (CPU ONNX)")
+        return cls._instance
 
 def get_model():
-    global model
-    if model is None:
-        model = load_embedding_model()
-    return model
+    return EmbeddingModelSingleton.get_instance()
 
 def generate_embeddings(chunks):
     texts = [chunk["text"] for chunk in chunks]

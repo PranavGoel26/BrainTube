@@ -256,4 +256,5 @@ if __name__ == "__main__":
         print("Node version Check:", subprocess.getoutput('node -v'))
     except Exception:
         pass
-    uvicorn.run("main:app", host="0.0.0.0", port=10000, reload=True)
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

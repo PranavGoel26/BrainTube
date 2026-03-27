@@ -78,8 +78,10 @@ def get_captions(video_id):
 # Download audio using yt-dlp
 # ----------------------------------
 def download_audio(url):
+    import glob
+    import subprocess
 
-    output = "/tmp/temp_audio.wav"
+    output_wav = "/tmp/temp_audio.wav"
 
     cookie_path = "cookies.txt"
     if os.path.exists("/etc/secrets/cookies.txt"):
@@ -88,24 +90,15 @@ def download_audio(url):
         cookie_path = "/tmp/cookies.txt"
 
     ydl_opts = {
-        "format": "ba/b",
-        "outtmpl": "/tmp/temp_audio.%(ext)s",
-        "postprocessors": [{
-            "key": "FFmpegExtractAudio",
-            "preferredcodec": "m4a",
-            "preferredquality": "192"
-        }],
+        "format": "bestaudio/best",
+        "outtmpl": "/tmp/temp_audio_dl.%(ext)s",
         "cookiefile": cookie_path,
-        "ffmpeg_location": "/usr/bin/ffmpeg",
         "verbose": True,
         "extractor_args": {
             "youtube": {
-                "player_client": ["android", "web"],
-                "skip": ["dash", "hls"]
+                "player_client": ["android", "web"]
             }
         },
-        "format_sort": ["res:720", "vcodec:h264", "acodec:m4a"],
-        "allow_unplayable_formats": True,
         "ignoreerrors": True,
         "javascript_runtimes": ["node", "nodejs"],
         "proxy": None,
@@ -117,17 +110,30 @@ def download_audio(url):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
-    import glob
-    files = glob.glob("/tmp/temp_audio.*")
-    if files:
-        for f in files:
-            if f != output:
-                os.rename(f, output)
-                break
+    # Convert whatever was downloaded to a standard 16k mono wav for Whisper
+    downloaded_files = glob.glob("/tmp/temp_audio_dl.*")
+    if downloaded_files:
+        downloaded_file = downloaded_files[0]
+        print(f"Downloaded audio. Converting to 16k mono wav...")
+        try:
+            subprocess.run([
+                "ffmpeg", "-y", "-i", downloaded_file, 
+                "-acodec", "pcm_s16le", "-ar", "16000", "-ac", "1", 
+                output_wav
+            ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            print(f"FFmpeg conversion failed: {e}. Renaming as fallback.")
+            if downloaded_file != output_wav:
+                os.rename(downloaded_file, output_wav)
+                
+        # Cleanup original download file if it's not the same path
+        if downloaded_file != output_wav and os.path.exists(downloaded_file):
+            try: os.remove(downloaded_file)
+            except: pass
     else:
-        print("Warning: yt-dlp finished but no /tmp/temp_audio files found.")
+        print("Warning: yt-dlp finished but no downloaded audio files found.")
 
-    return output
+    return output_wav
 
 
 # ----------------------------------
