@@ -19,10 +19,24 @@ def get_video_id(url):
 # ----------------------------------
 def get_captions(video_id):
     try:
-        # get_transcript prioritizes manual captions, then falls back to generated captions automatically.
-        data = YouTubeTranscriptApi.get_transcript(video_id, languages=['en', 'en-US'])
-        print("English captions (manual or auto-generated) found successfully.")
-        return [{"start": seg["start"], "end": seg["start"] + seg["duration"], "text": seg["text"]} for seg in data]
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        
+        # 1. Try to find any MANUAL english transcript first
+        for transcript in transcript_list:
+            if not transcript.is_generated and transcript.language_code.startswith('en'):
+                print(f"Manual {transcript.language_code} captions found.")
+                data = transcript.fetch()
+                return [{"start": seg["start"], "end": seg["start"] + seg["duration"], "text": seg["text"]} for seg in data]
+
+        # 2. Fallback to any GENERATED english transcript
+        for transcript in transcript_list:
+            if transcript.is_generated and transcript.language_code.startswith('en'):
+                print(f"Auto-generated {transcript.language_code} captions found.")
+                data = transcript.fetch()
+                return [{"start": seg["start"], "end": seg["start"] + seg["duration"], "text": seg["text"]} for seg in data]
+        
+        print("No English transcript (manual or generated) could be matched.")
+        return None
     except Exception as e:
         print(f"Caption retrieval failed for {video_id}: {e}")
         return None
