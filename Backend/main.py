@@ -138,13 +138,14 @@ class DeleteVideoRequest(BaseModel):
     video_url: str
 
 @app.post("/api/delete_video")
-async def delete_video(request: DeleteVideoRequest):
+async def delete_video(request: DeleteVideoRequest, background_tasks: BackgroundTasks):
     try:
         removed = remove_from_library(request.video_url)
-        deleted = delete_vector_store(request.video_url)
         if not removed:
             raise HTTPException(status_code=404, detail="Video not found in library.")
-        return {"status": "success", "library_removed": removed, "vectors_deleted": deleted}
+            
+        background_tasks.add_task(delete_vector_store, request.video_url)
+        return {"status": "success", "library_removed": removed, "vectors_deleted": True}
     except HTTPException:
         raise
     except Exception as e:

@@ -43,7 +43,7 @@ Standalone Query:"""
 # =====================================
 def build_prompt(question, chunks, history=None):
     # limit context size to avoid long prompts
-    chunks = chunks[:5]
+    chunks = chunks[:10]
 
     if len(chunks) == 0:
         context = "EMPTY_CONTEXT"

@@ -82,14 +82,14 @@ def multi_query_retrieval(question, index, chunks, bm25, top_k=5):
             seen.add(text)
     return unique
 
-def retrieve_context(query, video_id, threshold=2.5, top_k=5):
+def retrieve_context(query, video_id, threshold=2.5, top_k=15):
     index, chunks, bm25 = get_index_and_metadata(video_id)
     if not index:
         return []
     results = multi_query_retrieval(query, index, chunks, bm25, top_k)
     if not results:
         return []
-    results = rerank(query, results, top_k=3)
+    results = rerank(query, results, top_k=10)
     filtered = []
     for r in results:
         if "score" in r:
