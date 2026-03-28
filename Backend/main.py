@@ -69,8 +69,8 @@ def background_process_video(url, title, channel, duration_str):
         add_to_vector_database(chunks, url)
         
         # Scaled Summary Generation
-        transcript_text = " ".join([seg.get("text", "") for seg in transcript])
-        summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text[:10000]}"
+        transcript_text = " ".join([seg.get("text", "") for seg in transcript])[:15000]
+        summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text}"
         summary_text = generate_general_explanation(summary_query)
         
         # Save to library as completed
@@ -182,7 +182,7 @@ async def generate_quiz(request: QuizRequest):
         lib = get_library()
             
         num_questions = min(10, max(5, len(chunks) // 2))
-        transcript_sample = " ".join([c["text"] for c in chunks[:15]])
+        transcript_sample = " ".join([c["text"] for c in chunks])[:15000]
         
         response = generate_quiz_from_llm(num_questions, transcript_sample)
         

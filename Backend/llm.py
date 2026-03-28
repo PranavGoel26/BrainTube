@@ -129,7 +129,7 @@ Rules:
         messages=[
             {
                 "role": "system",
-                "content": "You are a helpful teacher explaining concepts simply."
+                "content": "You are a helpful teacher explaining concepts simply. The response MUST be in English. Do not use any other language."
             },
             {
                 "role": "user",
@@ -162,7 +162,7 @@ Transcript:
         messages=[
             {
                 "role": "system",
-                "content": "You are a quiz generation engine that strictly returns valid JSON arrays."
+                "content": "You are a quiz generation engine that strictly returns valid JSON arrays. The response MUST be in English. Do not use any other language."
             },
             {
                 "role": "user",

@@ -41,12 +41,24 @@ def get_captions(url):
         return None
         
     try:
-        resp = requests.get(f"https://api.supadata.ai/v1/transcript?url={url}", headers={"x-api-key": api_key}, timeout=15)
+        headers = {"x-api-key": api_key}
+        resp = requests.get(f"https://api.supadata.ai/v1/transcript?url={url}", headers=headers, timeout=15)
+        
+        import time
+        retries = 0
+        while resp.status_code == 202 and retries < 30:
+            job_id = resp.json().get("jobId")
+            if not job_id: break
+            time.sleep(2)
+            resp = requests.get(f"https://api.supadata.ai/v1/transcript/{job_id}", headers=headers, timeout=15)
+            retries += 1
+            
         if resp.status_code != 200:
             print(f"Supadata API Error {resp.status_code}: {resp.text}")
             return None
             
-        content = resp.json().get("content", [])
+        data = resp.json()
+        content = data.get("result", {}).get("content", []) if "result" in data else data.get("content", [])
         if not content: return None
             
         return [{
