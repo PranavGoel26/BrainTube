@@ -23,12 +23,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     #allow_origins=["*"],
-    allow_origins=[
-        "https://brain-tube.vercel.app",
-        "http://localhost:8080",
-        "http://localhost:8081",
-        "http://localhost:5173" # Keeping localhost so you can still test locally!
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
