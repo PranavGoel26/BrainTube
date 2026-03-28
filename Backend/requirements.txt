@@ -7,7 +7,7 @@ langchain
 langchain-groq
 langchain-community
 faiss-cpu
-youtube-transcript-api
+requests
 python-multipart
 fastembed
 google-cloud-storage
