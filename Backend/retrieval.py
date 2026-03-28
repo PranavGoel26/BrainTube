@@ -82,7 +82,7 @@ def multi_query_retrieval(question, index, chunks, bm25, top_k=5):
             seen.add(text)
     return unique
 
-def retrieve_context(query, video_id, threshold=1.2, top_k=5):
+def retrieve_context(query, video_id, threshold=2.5, top_k=5):
     index, chunks, bm25 = get_index_and_metadata(video_id)
     if not index:
         return []
