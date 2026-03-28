@@ -10,7 +10,6 @@ import json
 import re
 
 from youtube_ingest import process_youtube
-from transcription import transcribe_audio_chunks, process_video as local_process_video
 from chunking import create_chunks
 from embeddings import add_to_vector_database
 from rag_pipeline import ask_question
@@ -57,7 +56,21 @@ class QuizRequest(BaseModel):
 
 def background_process_video(url, title, channel, duration_str):
     try:
-        transcript = process_youtube(url, transcribe_audio_chunks)
+        transcript = process_youtube(url)
+        
+        if isinstance(transcript, dict) and transcript.get("error") == "NO_CAPTIONS":
+            add_to_library({
+                "id": url,
+                "url": url,
+                "title": title,
+                "channel": channel,
+                "duration": duration_str,
+                "analyzed": True,
+                "summary": transcript.get("message", "Video transcript unavailable."),
+                "thumbnail": "from-primary/30 to-accent/10"
+            })
+            return
+            
         chunks = create_chunks(transcript)
         add_to_vector_database(chunks, url)
         
@@ -79,18 +92,7 @@ def background_process_video(url, title, channel, duration_str):
         })
     except Exception as e:
         print(f"Background processing failed for {url}: {e}")
-    finally:
-        import shutil
-        # Cleanup temporary audio files and chunks (Zombie Files)
-        for ext in ['wav', 'webm', 'm4a', 'mp4']:
-            temp_file = f"/tmp/temp_audio.{ext}"
-            if os.path.exists(temp_file):
-                try:
-                    os.remove(temp_file)
-                except Exception:
-                    pass
-        if os.path.exists("/tmp/audio_chunks"):
-            shutil.rmtree("/tmp/audio_chunks", ignore_errors=True)
+
 
 @app.post("/api/process_video")
 async def process_video(request: VideoRequest, background_tasks: BackgroundTasks):
@@ -131,51 +133,6 @@ async def process_video(request: VideoRequest, background_tasks: BackgroundTasks
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/upload_local_video")
-async def upload_local_video(file: UploadFile = File(...)):
-    try:
-        # Save uploaded file temporarily
-        file_location = f"/tmp/temp_{file.filename}"
-        with open(file_location, "wb+") as file_object:
-            shutil.copyfileobj(file.file, file_object)
-            
-        title = file.filename
-        channel = "Local Upload"
-        duration_str = "Unknown"
-        
-        # Process the local video
-        transcript = local_process_video(file_location)
-        chunks = create_chunks(transcript)
-        
-        # Use filename as an ID for local videos
-        video_id = f"local_{file.filename}"
-        
-        add_to_vector_database(chunks, video_id)
-        
-        # Summary Generation
-        transcript_text = " ".join([seg["text"] for seg in transcript])
-        summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text[:10000]}"
-        summary_text = generate_general_explanation(summary_query)
-        
-        # Save to library
-        add_to_library({
-            "id": video_id,
-            "url": video_id,
-            "title": title,
-            "channel": channel,
-            "duration": duration_str,
-            "analyzed": True,
-            "summary": summary_text,
-            "thumbnail": "from-primary/30 to-accent/10"
-        })
-        
-        # Cleanup temp file
-        if os.path.exists(file_location):
-            os.remove(file_location)
-            
-        return {"status": "success", "message": "Local video processed successfully.", "chunks_created": len(chunks), "url": video_id}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/videos")
 async def get_videos():
