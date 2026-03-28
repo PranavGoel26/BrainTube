@@ -70,7 +70,7 @@ def background_process_video(url, title, channel, duration_str):
         add_to_vector_database(chunks, url)
         
         # Scaled Summary Generation
-        transcript_text = " ".join([seg["text"] for seg in transcript])
+        transcript_text = " ".join([seg.get("text", "") for seg in transcript])
         summary_query = f"Provide a detailed summary of this video transcript. The summary MUST be exactly 2 concise paragraphs. Do not use bullet points or numbered lists. Do not expand it unnecessarily. Do not use timestamps or reference the transcript directly. Transcript: {transcript_text[:10000]}"
         summary_text = generate_general_explanation(summary_query)
         
@@ -93,7 +93,15 @@ def background_process_video(url, title, channel, duration_str):
 async def process_video(request: VideoRequest, background_tasks: BackgroundTasks):
     try:
         try:
-            with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
+            ydl_opts = {
+                'quiet': True,
+                'no_warnings': True,
+                'http_headers': {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept-Language': 'en-US,en;q=0.9',
+                }
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 info = ydl.extract_info(request.url, download=False)
                 title = info.get('title', 'Unknown Title')
                 duration_sec = info.get('duration', 0)
