@@ -5,11 +5,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import uvicorn
-import yt_dlp
 import json
 import re
 
-from youtube_ingest import process_youtube
+from youtube_ingest import process_youtube, get_video_id, get_video_metadata
 from chunking import create_chunks
 from embeddings import add_to_vector_database
 from rag_pipeline import ask_question
@@ -93,26 +92,16 @@ def background_process_video(url, title, channel, duration_str):
 async def process_video(request: VideoRequest, background_tasks: BackgroundTasks):
     try:
         try:
-            ydl_opts = {
-                'quiet': True,
-                'no_warnings': True,
-                'cookiefile': 'Backend/cookies.txt',
-                'http_headers': {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                    'Accept-Language': 'en-US,en;q=0.9',
-                }
-            }
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(request.url, download=False)
-                title = info.get('title', 'Unknown Title')
-                duration_sec = info.get('duration', 0)
-                channel = info.get('uploader', 'Unknown Channel')
-                if duration_sec is not None:
-                    mins = duration_sec // 60
-                    secs = duration_sec % 60
-                    duration_str = f"{mins}:{secs:02d}"
-                else:
-                    duration_str = "0:00"
+            video_id = get_video_id(request.url)
+            if video_id:
+                meta = get_video_metadata(video_id)
+                title = meta["title"]
+                channel = meta["channel"]
+                duration_str = meta["duration"]
+            else:
+                title = "Unknown Title"
+                channel = "Unknown Channel"
+                duration_str = "0:00"
         except Exception:
             title = "Unknown Title"
             channel = "Unknown Channel"

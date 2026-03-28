@@ -1,7 +1,7 @@
 fastapi
 uvicorn
 pydantic
-yt-dlp
+google-api-python-client
 groq
 langchain
 langchain-groq

@@ -1,8 +1,9 @@
 import os
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import JSONFormatter
-
 from cache_utils import transcript_exists, load_transcript, save_transcript
+from googleapiclient.discovery import build
+import re
 
 # ----------------------------------
 # Extract video ID safely
@@ -13,6 +14,49 @@ def get_video_id(url):
     if "youtu.be/" in url:
         return url.split("youtu.be/")[1].split("?")[0]
     return None
+
+# ----------------------------------
+# Metadata via Official API
+# ----------------------------------
+def parse_iso_duration(iso_str):
+    if not iso_str.startswith("PT"):
+        return "0:00"
+    match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', iso_str)
+    if not match:
+        return "0:00"
+    hours = int(match.group(1) or 0)
+    minutes = int(match.group(2) or 0)
+    seconds = int(match.group(3) or 0)
+    if hours > 0:
+        return f"{hours}:{minutes:02d}:{seconds:02d}"
+    return f"{minutes}:{seconds:02d}"
+
+def get_video_metadata(video_id):
+    api_key = os.getenv("YOUTUBE_API_KEY")
+    default_meta = {"title": "Unknown Title", "channel": "Unknown Channel", "duration": "0:00"}
+    if not api_key:
+        print("Warning: YOUTUBE_API_KEY is not set. Cannot fetch metadata.")
+        return default_meta
+    
+    try:
+        youtube = build("youtube", "v3", developerKey=api_key)
+        request = youtube.videos().list(part="snippet,contentDetails", id=video_id)
+        response = request.execute()
+        
+        if not response.get("items"):
+            return default_meta
+            
+        item = response["items"][0]
+        title = item["snippet"].get("title", "Unknown Title")
+        channel = item["snippet"].get("channelTitle", "Unknown Channel")
+        
+        duration_iso = item["contentDetails"].get("duration", "")
+        duration_str = parse_iso_duration(duration_iso)
+        
+        return {"title": title, "channel": channel, "duration": duration_str}
+    except Exception as e:
+        print(f"YouTube Official API Metadata failed: {e}")
+        return default_meta
 
 # ----------------------------------
 # Fetch captions from YouTube
