@@ -19,7 +19,7 @@ def get_video_id(url):
 # ----------------------------------
 def get_captions(video_id):
     try:
-        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id, cookies='Backend/cookies.txt')
         
         # 1. Try to find any MANUAL english transcript first
         for transcript in transcript_list:
