@@ -43,7 +43,7 @@ Standalone Query:"""
 # =====================================
 def build_prompt(question, chunks, history=None):
     # limit context size to avoid long prompts
-    chunks = chunks[:10]
+    chunks = chunks[:5]
 
     if len(chunks) == 0:
         context = "EMPTY_CONTEXT"
@@ -59,7 +59,7 @@ def build_prompt(question, chunks, history=None):
             history_text += f"{role}: {msg.get('text')}\n"
 
     prompt = f"""
-You are an AI tutor answering student questions using lecture transcripts.
+You are a technical expert. You MUST answer in English. Even if the context looks confusing, NEVER switch to another language.
 
 Transcript Context:
 {context}
@@ -73,17 +73,15 @@ Student Question:
 Instructions:
 1. Read the transcript context and previous conversation carefully.
 2. If the answer is clearly present in the transcript context, explain the idea in your own words.
-3. If the user refers to previous context (like "what did you mean?" or "who is he?"), answer them naturally based on the history and the transcript.
+3. If the user refers to previous context (like "what did you mean?"), answer them naturally based on the history and the transcript.
 4. Do NOT copy sentences directly from the transcript.
-5. If the transcript does NOT contain the answer, and it cannot be logically inferred from the previous conversation, respond exactly with:
-
-NOT_FOUND
+5. If the information is not in the context, say exactly "I cannot find that specific detail in this video." instead of offering a general explanation.
 
 Important Rules:
 - Do NOT generate timestamps.
 - Do NOT mention the transcript in your answer.
 - Do NOT invent facts.
-- Return ONLY the answer or NOT_FOUND.
+- Return ONLY the answer.
 """
     return prompt
 

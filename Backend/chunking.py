@@ -214,7 +214,7 @@ def chunk_text(text, start_time, end_time, chunk_size=500, overlap=100):
 
 #     return chunks
 
-def create_chunks(transcript, chunk_size=1000, chunk_overlap=200):
+def create_chunks(transcript, chunk_size=800, chunk_overlap=200):
 
     # If transcript is a file path, load it
     if isinstance(transcript, str):
