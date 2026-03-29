@@ -4,6 +4,14 @@ const api = axios.create({
   baseURL: `${import.meta.env.VITE_BACKEND_URL}/api`,
 });
 
+export const setUserIdHeader = (userId: string | null | undefined) => {
+  if (userId) {
+    api.defaults.headers.common['x-user-id'] = userId;
+  } else {
+    delete api.defaults.headers.common['x-user-id'];
+  }
+};
+
 export const processVideo = async (url: string) => {
   const { data } = await api.post('/process_video', { url });
   return data;

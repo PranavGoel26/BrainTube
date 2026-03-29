@@ -10,20 +10,20 @@ from gcs_utils import download_from_gcs
 
 VECTOR_DIR = "/tmp/vector_store"
 
-def get_video_paths(video_id: str):
+def get_video_paths(video_id: str, user_id: str):
     safe_name = hashlib.md5(video_id.encode()).hexdigest()
-    base_dir = f"{VECTOR_DIR}/{safe_name}"
+    base_dir = f"{VECTOR_DIR}/{user_id}/{safe_name}"
     return f"{base_dir}/faiss_index.bin", f"{base_dir}/metadata.json"
 
-def get_index_and_metadata(video_id):
-    index_path, meta_path = get_video_paths(video_id)
+def get_index_and_metadata(video_id, user_id):
+    index_path, meta_path = get_video_paths(video_id, user_id)
     
     # Try downloading from GCS first if missing locally
     if not os.path.exists(index_path) or not os.path.exists(meta_path):
         import hashlib
         safe_name = hashlib.md5(video_id.encode()).hexdigest()
-        download_from_gcs(f"vector_store/{safe_name}/faiss_index.bin", index_path)
-        download_from_gcs(f"vector_store/{safe_name}/metadata.json", meta_path)
+        download_from_gcs(f"users/{user_id}/vector_store/{safe_name}/faiss_index.bin", index_path)
+        download_from_gcs(f"users/{user_id}/vector_store/{safe_name}/metadata.json", meta_path)
 
     try:
         index = faiss.read_index(index_path)
@@ -82,8 +82,8 @@ def multi_query_retrieval(question, index, chunks, bm25, top_k=5):
             seen.add(text)
     return unique
 
-def retrieve_context(query, video_id, threshold=2.5, top_k=12):
-    index, chunks, bm25 = get_index_and_metadata(video_id)
+def retrieve_context(query, video_id, user_id, threshold=2.5, top_k=12):
+    index, chunks, bm25 = get_index_and_metadata(video_id, user_id)
     if not index:
         return []
     results = multi_query_retrieval(query, index, chunks, bm25, top_k)

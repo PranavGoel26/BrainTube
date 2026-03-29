@@ -1,13 +1,13 @@
 from retrieval import retrieve_context
 from llm import build_prompt, generate_answer, rewrite_query
 
-def ask_question(question, video_id, history=None):
+def ask_question(question, video_id, user_id, history=None):
     try:
         standalone_query = question
         if history and len(history) > 0:
             standalone_query = rewrite_query(question, history)
             
-        chunks = retrieve_context(standalone_query, video_id)
+        chunks = retrieve_context(standalone_query, video_id, user_id)
         if not chunks or len(chunks) == 0:
             return {
                 "status": "not_found",

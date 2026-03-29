@@ -3,24 +3,27 @@ import os
 from typing import List, Dict, Any
 from gcs_utils import download_from_gcs, upload_to_gcs
 
-LIBRARY_FILE = "/tmp/data/library.json"
-GCS_BLOB_NAME = "data/library.json"
+def get_library_paths(user_id: str):
+    return f"/tmp/data/{user_id}_library.json", f"users/{user_id}/library.json"
 
-def init_library() -> None:
+def init_library(user_id: str) -> None:
     os.makedirs("/tmp/data", exist_ok=True)
-    if not os.path.exists(LIBRARY_FILE):
-        success = download_from_gcs(GCS_BLOB_NAME, LIBRARY_FILE)
+    local_file, gcs_blob = get_library_paths(user_id)
+    if not os.path.exists(local_file):
+        success = download_from_gcs(gcs_blob, local_file)
         if not success:
-            with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
+            with open(local_file, "w", encoding="utf-8") as f:
                 json.dump([], f)
 
-def get_library() -> List[Dict[str, Any]]:
-    init_library()
-    with open(LIBRARY_FILE, "r", encoding="utf-8") as f:
+def get_library(user_id: str) -> List[Dict[str, Any]]:
+    init_library(user_id)
+    local_file, _ = get_library_paths(user_id)
+    with open(local_file, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def add_to_library(video_data: Dict[str, Any]) -> None:
-    lib = get_library()
+def add_to_library(video_data: Dict[str, Any], user_id: str) -> None:
+    lib = get_library(user_id)
+    video_data["user_id"] = user_id
     # Update if already exists, else append
     for idx, v in enumerate(lib):
         if v.get("url") == video_data.get("url"):
@@ -29,16 +32,18 @@ def add_to_library(video_data: Dict[str, Any]) -> None:
     else:
         lib.append(video_data)
         
-    with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
+    local_file, gcs_blob = get_library_paths(user_id)
+    with open(local_file, "w", encoding="utf-8") as f:
         json.dump(lib, f, indent=2)
-    upload_to_gcs(LIBRARY_FILE, GCS_BLOB_NAME)
+    upload_to_gcs(local_file, gcs_blob)
 
-def remove_from_library(video_url: str) -> bool:
-    lib = get_library()
+def remove_from_library(video_url: str, user_id: str) -> bool:
+    lib = get_library(user_id)
     new_lib = [v for v in lib if v.get("url") != video_url]
     if len(new_lib) == len(lib):
         return False  # Not found
-    with open(LIBRARY_FILE, "w", encoding="utf-8") as f:
+    local_file, gcs_blob = get_library_paths(user_id)
+    with open(local_file, "w", encoding="utf-8") as f:
         json.dump(new_lib, f, indent=2)
-    upload_to_gcs(LIBRARY_FILE, GCS_BLOB_NAME)
+    upload_to_gcs(local_file, gcs_blob)
     return True

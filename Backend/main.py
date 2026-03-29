@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks
+from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Header
 import shutil
 import os
 from fastapi.middleware.cors import CORSMiddleware
@@ -48,7 +48,7 @@ class ChatRequest(BaseModel):
 class QuizRequest(BaseModel):
     video_url: str
 
-def background_process_video(url, title, channel, duration_str):
+def background_process_video(url, title, channel, duration_str, user_id):
     try:
         transcript = process_youtube(url)
         
@@ -62,11 +62,11 @@ def background_process_video(url, title, channel, duration_str):
                 "analyzed": True,
                 "summary": transcript.get("message", "Video transcript unavailable."),
                 "thumbnail": "from-primary/30 to-accent/10"
-            })
+            }, user_id)
             return
             
         chunks = create_chunks(transcript)
-        add_to_vector_database(chunks, url)
+        add_to_vector_database(chunks, url, user_id)
         
         # Scaled Summary Generation
         transcript_text = " ".join([seg.get("text", "") for seg in transcript])[:15000]
@@ -83,13 +83,13 @@ def background_process_video(url, title, channel, duration_str):
             "analyzed": True,
             "summary": summary_text,
             "thumbnail": "from-primary/30 to-accent/10"
-        })
+        }, user_id)
     except Exception as e:
         print(f"Background processing failed for {url}: {e}")
 
 
 @app.post("/api/process_video")
-async def process_video(request: VideoRequest, background_tasks: BackgroundTasks):
+async def process_video(request: VideoRequest, background_tasks: BackgroundTasks, x_user_id: str = Header(..., alias="x-user-id")):
     try:
         try:
             video_id = get_video_id(request.url)
@@ -117,10 +117,10 @@ async def process_video(request: VideoRequest, background_tasks: BackgroundTasks
             "analyzed": False,
             "summary": "This video is currently being analyzed by BrainTube. It usually takes less than 30 seconds. Please refresh the page in a moment.",
             "thumbnail": "from-primary/30 to-accent/10"
-        })
+        }, x_user_id)
 
         # Process in background
-        background_tasks.add_task(background_process_video, request.url, title, channel, duration_str)
+        background_tasks.add_task(background_process_video, request.url, title, channel, duration_str, x_user_id)
         
         return {"status": "success", "message": "Video analysis started in the background.", "url": request.url}
     except Exception as e:
@@ -128,9 +128,9 @@ async def process_video(request: VideoRequest, background_tasks: BackgroundTasks
 
 
 @app.get("/api/videos")
-async def get_videos():
+async def get_videos(x_user_id: str = Header(..., alias="x-user-id")):
     try:
-        return get_library()
+        return get_library(x_user_id)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -138,13 +138,13 @@ class DeleteVideoRequest(BaseModel):
     video_url: str
 
 @app.post("/api/delete_video")
-async def delete_video(request: DeleteVideoRequest, background_tasks: BackgroundTasks):
+async def delete_video(request: DeleteVideoRequest, background_tasks: BackgroundTasks, x_user_id: str = Header(..., alias="x-user-id")):
     try:
-        removed = remove_from_library(request.video_url)
+        removed = remove_from_library(request.video_url, x_user_id)
         if not removed:
             raise HTTPException(status_code=404, detail="Video not found in library.")
             
-        background_tasks.add_task(delete_vector_store, request.video_url)
+        background_tasks.add_task(delete_vector_store, request.video_url, x_user_id)
         return {"status": "success", "library_removed": removed, "vectors_deleted": True}
     except HTTPException:
         raise
@@ -152,17 +152,17 @@ async def delete_video(request: DeleteVideoRequest, background_tasks: Background
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/chat")
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest, x_user_id: str = Header(..., alias="x-user-id")):
     try:
         if not request.video_url:
             raise ValueError("video_url is required for ask_question")
-        result = ask_question(request.query, request.video_url, request.history)
+        result = ask_question(request.query, request.video_url, x_user_id, request.history)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/general_explanation")
-async def explanation(request: ChatRequest):
+async def explanation(request: ChatRequest, x_user_id: str = Header(..., alias="x-user-id")):
     try:
         ans = generate_general_explanation(request.query)
         return {"answer": ans}
@@ -170,17 +170,17 @@ async def explanation(request: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/quiz")
-async def generate_quiz(request: QuizRequest):
+async def generate_quiz(request: QuizRequest, x_user_id: str = Header(..., alias="x-user-id")):
     try:
         try:
-            index, chunks, bm25 = get_index_and_metadata(request.video_url)
+            index, chunks, bm25 = get_index_and_metadata(request.video_url, x_user_id)
         except Exception:
             return {"error": "I'm sorry, I couldn't process this video's audio. Please try another video or check the logs for download errors."}
 
         if not chunks:
              return {"error": "I'm sorry, I couldn't process this video's audio. Please try another video or check the logs for download errors."}
             
-        lib = get_library()
+        lib = get_library(x_user_id)
             
         num_questions = min(10, max(5, len(chunks) // 2))
         transcript_sample = " ".join([c["text"] for c in chunks])[:15000]

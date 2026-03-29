@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Brain, LayoutDashboard, Upload, MessageSquare, FileText, HelpCircle, Library, Menu, X, Sun, Moon } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
-import { UserButton } from '@clerk/clerk-react';
+import { UserButton, useAuth } from '@clerk/clerk-react';
 import { useTheme } from '@/contexts/ThemeProvider';
+import { setUserIdHeader } from '../lib/api';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -18,6 +19,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const { userId } = useAuth();
+
+  useEffect(() => {
+    setUserIdHeader(userId);
+  }, [userId]);
 
   return (
     <div className="min-h-screen bg-background flex">
