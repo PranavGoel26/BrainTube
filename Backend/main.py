@@ -1,21 +1,18 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File, BackgroundTasks, Header
-import shutil
 import os
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional
-import uvicorn
-import json
 import re
+import json
+from typing import Optional
+from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Header
+from fastapi.middleware.cors import CORSMiddleware
 
 from youtube_ingest import process_youtube, get_video_id, get_video_metadata
 from chunking import create_chunks
-from embeddings import add_to_vector_database
+from embeddings import add_to_vector_database, delete_vector_store
 from rag_pipeline import ask_question
 from llm import generate_general_explanation, generate_quiz_from_llm
 from library_store import add_to_library, get_library, remove_from_library
 from retrieval import get_index_and_metadata
-from embeddings import add_to_vector_database, delete_vector_store
 
 app = FastAPI()
 
@@ -203,6 +200,7 @@ async def generate_quiz(request: QuizRequest, x_user_id: str = Header(..., alias
 
 if __name__ == "__main__":
     import subprocess
+    import uvicorn
     try:
         print("Node version Check:", subprocess.getoutput('node -v'))
     except Exception:
