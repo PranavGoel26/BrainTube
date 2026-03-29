@@ -103,7 +103,6 @@ export default function HeroSection() {
           BrainTube synthesizes video into structured intelligence.
           Learn at the speed of thought.
           <br className="hidden md:block" />
-          powered by RAG architecture.
         </motion.p>
 
         {/* URL Input */}
