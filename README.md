@@ -13,61 +13,6 @@ BrainTube synthesizes educational video content into structured intelligence, tr
 *   **User Isolation:** Complete sandboxing using Clerk Authentication. Data, vector stores, and watch history are strictly tied to unique user accounts.
 *   **Hardware-Accelerated UI:** The frontend runs on React + Framer Motion, utilizing buttery-smooth `useSpring` cursor tracking, React Three Fiber nodes, and glassmorphism styling.
 
-## 🛠 Tech Stack
-
-**Frontend:**
-*   React + TypeScript (Vite)
-*   Framer Motion (Physics-based animations)
-*   TailwindCSS + Shadcn UI
-*   React Three Fiber (3D rendering)
-*   Clerk (Authentication)
-
-**Backend:**
-*   FastAPI (Python)
-*   LangChain + FAISS (Vector Store / Embeddings)
-*   Groq API (`llama-3.3-70b-versatile`)
-*   Google Cloud Storage (Cloud storage)
-
-## 🚀 Quick Start
-
-### 1. Requirements
-*   Node.js v18+
-*   Python 3.10+
-
-### 2. Environment Variables
-
-Create `.env` files in both directories.
-
-**Backend (`Backend/.env`):**
-```env
-YOUTUBE_API_KEY="..."
-SUPADATA_API_KEY="..."
-GROQ_API_KEY="..."
-GOOGLE_APPLICATION_CREDENTIALS="..." 
-```
-
-**Frontend (`frontend/.env.local`):**
-```env
-VITE_CLERK_PUBLISHABLE_KEY="..."
-VITE_API_URL="http://localhost:8080/api"
-```
-
-### 3. Run Locally
-
-**Boot the Engine (Backend):**
-```bash
-cd Backend
-pip install -r requirements.txt
-uvicorn main:app --reload --port 8080
-```
-
-**Boot the UI (Frontend):**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
 ## 🏗 Architecture Workflow
 1. User provides a YouTube link.
 2. Backend validates the metadata and dispatches the task.
