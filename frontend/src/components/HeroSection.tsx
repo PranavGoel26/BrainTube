@@ -89,9 +89,9 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-4 sm:mb-6"
         >
-          <span className="text-foreground">Add a Brain to</span>
+          <span className="text-foreground">Deconstruct</span>
           <br />
-          <span className="glow-text">your YouTube Videos.</span>
+          <span className="glow-text">Reality.</span>
         </motion.h1>
 
         <motion.p
@@ -100,7 +100,8 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 sm:mb-10 leading-relaxed px-2"
         >
-          Instant summaries, technical deep-dives, and interactive quizzes
+          BrainTube synthesizes video into structured intelligence.
+          Learn at the speed of thought.
           <br className="hidden md:block" />
           powered by RAG architecture.
         </motion.p>
@@ -152,7 +153,7 @@ export default function HeroSection() {
 
 function FloatingCard({ label, i, smoothX }: { label: string; i: number; smoothX: any }) {
   const x = useTransform(smoothX, (v: number) => Math.min(Math.max(v * (5 + i * 5), -50), 50));
-  
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
