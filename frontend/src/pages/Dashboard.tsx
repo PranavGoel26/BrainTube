@@ -47,8 +47,16 @@ export default function Dashboard() {
   return (
     <AppLayout>
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1">Dashboard</h1>
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 relative z-10 w-fit">
+          <div className="relative inline-block">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 relative z-10">Dashboard</h1>
+            {/* Neural Pulse Animation */}
+            <motion.div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[200%] bg-primary/20 rounded-[100%] blur-2xl -z-10 pointer-events-none"
+              animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.6, 0.3] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          </div>
           <p className="text-sm text-muted-foreground">Your learning intelligence at a glance.</p>
         </motion.div>
 

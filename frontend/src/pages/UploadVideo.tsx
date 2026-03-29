@@ -84,6 +84,36 @@ export default function UploadVideo() {
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowRight className="h-4 w-4" />}
             </motion.button>
           </div>
+
+          {/* Animated Progress Bar */}
+          {isLoading && (
+            <motion.div 
+               initial={{ opacity: 0, height: 0 }}
+               animate={{ opacity: 1, height: 'auto' }}
+               className="mt-4"
+            >
+              <div className="flex justify-between items-center mb-1.5 px-1">
+                <span className="text-xs font-medium text-primary flex items-center gap-2">
+                  <Loader2 className="w-3 h-3 animate-spin"/> Extracting Knowledge Base...
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden relative">
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-primary/80"
+                  initial={{ width: '0%', x: '-100%' }}
+                  animate={{ width: '40%', x: '300%' }}
+                  transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                />
+                <motion.div
+                  className="absolute inset-y-0 left-0 bg-accent/80"
+                  initial={{ width: '0%', x: '-100%' }}
+                  animate={{ width: '30%', x: '400%' }}
+                  transition={{ repeat: Infinity, duration: 2, delay: 0.5, ease: "easeInOut" }}
+                />
+              </div>
+            </motion.div>
+          )}
+
           {error && <p className="text-red-500 text-sm mt-2 font-medium">{error}</p>}
         </motion.div>
 

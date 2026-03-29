@@ -4,6 +4,17 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/AppLayout';
 import { fetchVideos, deleteVideo } from '@/lib/api';
+import { toast } from 'sonner';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100, damping: 20 } },
+};
 
 type Video = {
   id: string;
@@ -38,8 +49,10 @@ export default function VideoLibrary() {
       setDeletingVideo(videoUrl);
       await deleteVideo(videoUrl);
       setVideos(prev => prev.filter(v => v.url !== videoUrl));
+      toast.success('Video removed from library');
     } catch (err) {
       console.error('Failed to delete video:', err);
+      toast.error('Failed to remove video');
     } finally {
       setDeletingVideo(null);
     }
@@ -102,16 +115,19 @@ export default function VideoLibrary() {
              <p className="text-muted-foreground">No videos found. Upload a video to get started.</p>
           </div>
         ) : (
-          <div className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}>
+          <motion.div 
+            className={view === 'grid' ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-3'}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+          >
             {filtered.map((v, i) => {
               const ytId = getYoutubeId(v.url);
               const isHovered = hoveredVideo === v.url;
               return (
                 <motion.div
                   key={v.id || i}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  variants={itemVariants}
                   className={`glass-panel-hover cursor-pointer ${view === 'list' ? 'flex items-center gap-4 p-3' : ''}`}
                   onMouseEnter={() => setHoveredVideo(v.url)}
                   onMouseLeave={() => setHoveredVideo(null)}
@@ -184,7 +200,7 @@ export default function VideoLibrary() {
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
       </div>
     </AppLayout>

@@ -1,20 +1,36 @@
 import { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { ArrowRight, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BrainScene from './BrainScene';
 
 export default function HeroSection() {
   const [url, setUrl] = useState('');
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const navigate = useNavigate();
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springConfig = { damping: 25, stiffness: 80 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const orb1X = useTransform(smoothX, (v) => v * 30);
+  const orb1Y = useTransform(smoothY, (v) => v * 30);
+
+  const orb2X = useTransform(smoothX, (v) => v * -20);
+  const orb2Y = useTransform(smoothY, (v) => v * -20);
+
+  const brainX = useTransform(smoothX, (v) => v * 15);
+  const brainY = useTransform(smoothY, (v) => v * 15);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
     const y = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
-    setMousePos({ x, y });
-  }, []);
+    mouseX.set(x);
+    mouseY.set(y);
+  }, [mouseX, mouseY]);
 
   return (
     <section
@@ -24,31 +40,31 @@ export default function HeroSection() {
       {/* Gradient Orbs that follow mouse */}
       <motion.div
         className="gradient-orb w-[400px] h-[400px] sm:w-[500px] sm:h-[500px] bg-primary/30 top-[-10%] left-[-10%]"
-        animate={{
-          x: mousePos.x * 30,
-          y: mousePos.y * 30,
+        style={{
+          x: orb1X,
+          y: orb1Y,
+          animationName: 'pulse-glow',
+          animationDuration: '3s',
+          animationIterationCount: 'infinite',
         }}
-        transition={{ type: 'spring', stiffness: 50, damping: 20 }}
-        style={{ animationName: 'pulse-glow', animationDuration: '3s', animationIterationCount: 'infinite' }}
       />
       <motion.div
         className="gradient-orb w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] bg-accent/20 bottom-[-10%] right-[-10%]"
-        animate={{
-          x: mousePos.x * -20,
-          y: mousePos.y * -20,
+        style={{
+          x: orb2X,
+          y: orb2Y,
+          animationName: 'pulse-glow',
+          animationDuration: '3s',
+          animationDelay: '1.5s',
+          animationIterationCount: 'infinite',
         }}
-        transition={{ type: 'spring', stiffness: 50, damping: 20 }}
-        style={{ animationName: 'pulse-glow', animationDuration: '3s', animationDelay: '1.5s', animationIterationCount: 'infinite' }}
       />
+
 
       {/* 3D Brain - responds to mouse */}
       <motion.div
         className="absolute inset-0 z-0"
-        animate={{
-          x: mousePos.x * 15,
-          y: mousePos.y * 15,
-        }}
-        transition={{ type: 'spring', stiffness: 80, damping: 25 }}
+        style={{ x: brainX, y: brainY }}
       >
         <BrainScene />
       </motion.div>
@@ -73,9 +89,9 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           className="text-4xl sm:text-5xl md:text-7xl font-extrabold tracking-tight leading-[1.05] mb-4 sm:mb-6"
         >
-          <span className="text-foreground">Deconstruct</span>
+          <span className="text-foreground">Add a Brain to</span>
           <br />
-          <span className="glow-text">Reality.</span>
+          <span className="glow-text">your YouTube Videos.</span>
         </motion.h1>
 
         <motion.p
@@ -84,9 +100,9 @@ export default function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mb-8 sm:mb-10 leading-relaxed px-2"
         >
-          BrainTube synthesizes video into structured intelligence.
+          Instant summaries, technical deep-dives, and interactive quizzes
           <br className="hidden md:block" />
-          Learn at the speed of thought.
+          powered by RAG architecture.
         </motion.p>
 
         {/* URL Input */}
@@ -123,30 +139,35 @@ export default function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
-          className="flex gap-3 sm:gap-4 mt-10 sm:mt-16 flex-wrap justify-center"
+          className="flex gap-3 sm:gap-4 mt-10 sm:mt-16 flex-wrap justify-center relative z-20"
         >
           {['Transcript', 'AI Answers', 'Summary', 'Quiz'].map((label, i) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                x: mousePos.x * (5 + i * 3),
-              }}
-              transition={{
-                opacity: { delay: 0.7 + i * 0.1, duration: 0.5 },
-                y: { delay: 0.7 + i * 0.1, duration: 0.5 },
-                x: { type: 'spring', stiffness: 100, damping: 20 },
-              }}
-              className="glass-panel px-4 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-xs font-medium text-muted-foreground"
-              style={{ animation: `float 6s ease-in-out ${i * 0.8}s infinite` }}
-            >
-              {label}
-            </motion.div>
+            <FloatingCard key={label} label={label} i={i} smoothX={smoothX} />
           ))}
         </motion.div>
       </div>
     </section>
+  );
+}
+
+function FloatingCard({ label, i, smoothX }: { label: string; i: number; smoothX: any }) {
+  const x = useTransform(smoothX, (v: number) => Math.min(Math.max(v * (5 + i * 5), -50), 50));
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        opacity: { delay: 0.7 + i * 0.1, duration: 0.5 },
+        y: { delay: 0.7 + i * 0.1, duration: 0.5 },
+      }}
+      className="glass-panel px-4 sm:px-5 py-2.5 sm:py-3 text-[10px] sm:text-xs font-medium text-muted-foreground"
+      style={{
+        x,
+        animation: `float 6s ease-in-out ${i * 0.8}s infinite`,
+      }}
+    >
+      {label}
+    </motion.div>
   );
 }
